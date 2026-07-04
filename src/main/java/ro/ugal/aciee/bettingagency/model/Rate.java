@@ -1,5 +1,6 @@
 package ro.ugal.aciee.bettingagency.model;
 
+import ro.ugal.aciee.bettingagency.model.enums.RateStatus;
 import ro.ugal.aciee.bettingagency.model.enums.RateType;
 
 public class Rate {
@@ -7,12 +8,14 @@ public class Rate {
     private int matchId;
     private RateType type;
     private double value;
+    private RateStatus rateStatus;
 
-    public Rate(int rateId, int matchId, RateType type, double value) {
+    public Rate(int rateId, int matchId, RateType type, double value, RateStatus rateStatus) {
         this.rateId = rateId;
         this.matchId = matchId;
         this.type = type;
         this.value = value;
+        this.rateStatus = rateStatus;
     }
 
     public int getRateId() {
@@ -43,13 +46,22 @@ public class Rate {
         this.value = value;
     }
 
+    public RateStatus getRateStatus() {
+        return rateStatus;
+    }
+
+    public void setRateStatus(RateStatus rateStatus) {
+        this.rateStatus = rateStatus;
+    }
+
     @Override
     public String toString() {
         return "Rate{" +
                 "rateId=" + rateId +
                 ", matchId=" + matchId +
-                ", type='" + type + '\'' +
+                ", type=" + type +
                 ", value=" + value +
+                ", rateStatus=" + rateStatus +
                 '}';
     }
 }

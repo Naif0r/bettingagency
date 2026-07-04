@@ -10,13 +10,17 @@ public class Bet {
     private double amount;
     private BetStatus betStatus;
     private LocalDateTime createdAt;
+    private double totalOdds;
+    private double possibleWin;
 
-    public Bet(int betId, int userId, double amount, BetStatus betStatus, LocalDateTime createdAt) {
+    public Bet(int betId, int userId, double amount, BetStatus betStatus, LocalDateTime createdAt, double totalOdds, double possibleWin) {
         this.betId = betId;
         this.userId = userId;
         this.amount = amount;
         this.betStatus = betStatus;
         this.createdAt = createdAt;
+        this.totalOdds = totalOdds;
+        this.possibleWin = possibleWin;
     }
 
     public int getBetId() {
@@ -55,6 +59,22 @@ public class Bet {
         this.createdAt = createdAt;
     }
 
+    public double getTotalOdds() {
+        return totalOdds;
+    }
+
+    public void setTotalOdds(double totalOdds) {
+        this.totalOdds = totalOdds;
+    }
+
+    public double getPossibleWin() {
+        return possibleWin;
+    }
+
+    public void setPossibleWin(double possibleWin) {
+        this.possibleWin = possibleWin;
+    }
+
     @Override
     public String toString() {
         return "Bet{" +
@@ -63,6 +83,8 @@ public class Bet {
                 ", amount=" + amount +
                 ", betStatus=" + betStatus +
                 ", createdAt=" + createdAt +
+                ", totalOdds=" + totalOdds +
+                ", possibleWin=" + possibleWin +
                 '}';
     }
 }
