@@ -5,31 +5,38 @@ import ro.ugal.aciee.bettingagency.model.enums.Role;
 
 public class Account {
     private final int userId;
-    private String userName;
+    private String username;
     private String password;
     private Role role;
     private AccountStatus accountStatus;
     private double balance;
 
-    public Account(int userId, String userName, String password, Role role, AccountStatus accountAccountStatus, double balance) {
+    public Account(int userId, String username, String password, Role role, AccountStatus accountAccountStatus, double balance) {
         this.userId = userId;
-        this.userName = userName;
+        this.username = username;
         this.password = password;
         this.role = role;
         this.accountStatus = accountAccountStatus;
         this.balance = balance;
     }
 
+    public Account(String username, String password, Role role) {
+        this.userId = 0;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
+
     public int getUserId() {
         return this.userId;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String userName) {
+        this.username = userName;
     }
 
     public String getPassword() {
@@ -68,7 +75,7 @@ public class Account {
     public String toString() {
         return "Account{" +
                 "userId=" + userId +
-                ", userName='" + userName + '\'' +
+                ", userName='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", role=" + role +
                 ", accountStatus=" + accountStatus +
