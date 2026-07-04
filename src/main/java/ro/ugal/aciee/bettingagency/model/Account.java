@@ -20,13 +20,6 @@ public class Account {
         this.balance = balance;
     }
 
-    public Account(String username, String password, Role role) {
-        this.userId = 0;
-        this.username = username;
-        this.password = password;
-        this.role = role;
-    }
-
     public int getUserId() {
         return this.userId;
     }
