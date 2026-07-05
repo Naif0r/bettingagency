@@ -1,9 +1,12 @@
 package ro.ugal.aciee.bettingagency.model;
 
 public class Team {
-    private final int teamId;
+    private int teamId;
     private int sportId;
     private String teamName;
+
+    public Team() {
+    }
 
     public Team(int teamId, int sportId, String teamName) {
         this.teamId = teamId;
@@ -13,6 +16,10 @@ public class Team {
 
     public int getTeamId() {
         return teamId;
+    }
+
+    public void setTeamId(int teamId) {
+        this.teamId = teamId;
     }
 
     public int getSportId() {

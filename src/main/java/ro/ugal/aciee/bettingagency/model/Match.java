@@ -5,12 +5,15 @@ import ro.ugal.aciee.bettingagency.model.enums.MatchStatus;
 import java.time.LocalDateTime;
 
 public class Match {
-    private final int matchId;
+    private int matchId;
     private int sportId;
     private int team1Id;
     private int team2Id;
     private LocalDateTime matchDate;
     private MatchStatus matchStatus;
+
+    public Match() {
+    }
 
     public Match(int matchId, int sportId, int team1Id, int team2Id, LocalDateTime matchDate, MatchStatus matchStatus) {
         this.matchId = matchId;
@@ -23,6 +26,10 @@ public class Match {
 
     public int getMatchId() {
         return matchId;
+    }
+
+    public void setMatchId(int matchId) {
+        this.matchId = matchId;
     }
 
     public int getSportId() {

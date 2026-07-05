@@ -1,8 +1,11 @@
 package ro.ugal.aciee.bettingagency.model;
 
 public class Sport {
-    private final int sportId;
+    private int sportId;
     private String sportName;
+
+    public Sport() {
+    }
 
     public Sport(int sportId, String sportName) {
         this.sportId = sportId;
@@ -11,6 +14,10 @@ public class Sport {
 
     public int getSportId() {
         return sportId;
+    }
+
+    public void setSportId(int sportId) {
+        this.sportId = sportId;
     }
 
     public String getSportName() {

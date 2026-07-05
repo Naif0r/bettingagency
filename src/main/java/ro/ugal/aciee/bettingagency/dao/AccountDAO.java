@@ -5,10 +5,7 @@ import ro.ugal.aciee.bettingagency.model.enums.AccountStatus;
 import ro.ugal.aciee.bettingagency.model.enums.Role;
 import ro.ugal.aciee.bettingagency.utils.ConnectionManager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +77,7 @@ public class AccountDAO {
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, username);
             stmt.setInt(2, id);
-            return stmt.executeUpdate() == 1;
+            return stmt.executeUpdate() > 0;
         }
     }
 
@@ -90,7 +87,7 @@ public class AccountDAO {
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, password);
             stmt.setInt(2, id);
-            return stmt.executeUpdate() == 1;
+            return stmt.executeUpdate() > 0;
         }
     }
 
@@ -100,7 +97,7 @@ public class AccountDAO {
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, accountStatus.name());
             stmt.setInt(2, id);
-            return stmt.executeUpdate() == 1;
+            return stmt.executeUpdate() > 0;
         }
     }
 
@@ -110,19 +107,24 @@ public class AccountDAO {
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setDouble(1, balance);
             stmt.setInt(2, id);
-            return stmt.executeUpdate() == 1;
+            return stmt.executeUpdate() > 0;
         }
     }
 
-    public boolean insert(Account account) throws SQLException {
+    public Account save(Account account) throws SQLException {
         String sql = "INSERT INTO ACCOUNT (username, password, role) " +
                 "VALUES (?, ?, ?)";
         try (Connection con = ConnectionManager.open();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
+             PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, account.getUsername());
             stmt.setString(2, account.getPassword());
             stmt.setString(3, account.getRole().name());
-            return stmt.executeUpdate() == 1;
+            stmt.executeUpdate();
+            ResultSet keys = stmt.getGeneratedKeys();
+            if (keys.next()) {
+                account.setUserId(keys.getInt("user_id"));
+            }
+            return account;
         }
     }
 
@@ -131,7 +133,7 @@ public class AccountDAO {
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, id);
-            return stmt.executeUpdate() == 1;
+            return stmt.executeUpdate() > 0;
         }
     }
 }

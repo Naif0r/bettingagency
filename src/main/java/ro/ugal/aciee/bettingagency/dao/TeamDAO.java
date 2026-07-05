@@ -3,22 +3,24 @@ package ro.ugal.aciee.bettingagency.dao;
 import ro.ugal.aciee.bettingagency.model.Team;
 import ro.ugal.aciee.bettingagency.utils.ConnectionManager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TeamDAO {
-    public boolean insert(Team team) throws SQLException {
+    public Team save(Team team) throws SQLException {
         String sql = "INSERT INTO TEAM (sport_id, team_name)" +
                 "VALUES (?, ?)";
         try (Connection con = ConnectionManager.open();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
+             PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, team.getSportId());
             stmt.setString(2, team.getTeamName());
-            return stmt.executeUpdate() == 1;
+            stmt.executeUpdate();
+            ResultSet keys = stmt.getGeneratedKeys();
+            if (keys.next()) {
+                team.setTeamId(keys.getInt("team_id"));
+            }
+            return team;
         }
     }
 
@@ -53,6 +55,25 @@ public class TeamDAO {
             }
         }
         return teamList;
+    }
+
+    public boolean updateTeamName(String teamName, int teamId) throws SQLException {
+        String sql = "UPDATE TEAM SET team_name = ? WHERE team_id = ?";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, teamName);
+            stmt.setInt(2, teamId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    public boolean delete(int teamId) throws SQLException {
+        String sql = "DELETE FROM TEAM WHERE team_id = ?";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, teamId);
+            return stmt.executeUpdate() > 0;
+        }
     }
 
 }

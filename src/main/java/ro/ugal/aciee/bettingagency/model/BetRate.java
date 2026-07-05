@@ -4,6 +4,9 @@ public class BetRate {
     private int betId;
     private int rateId;
 
+    public BetRate() {
+    }
+
     public BetRate(int betId, int rateId) {
         this.betId = betId;
         this.rateId = rateId;

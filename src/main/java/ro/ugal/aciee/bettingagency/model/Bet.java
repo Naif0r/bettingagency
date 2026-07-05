@@ -5,13 +5,16 @@ import ro.ugal.aciee.bettingagency.model.enums.BetStatus;
 import java.time.LocalDateTime;
 
 public class Bet {
-    private final int betId;
+    private int betId;
     private int userId;
     private double amount;
     private BetStatus betStatus;
     private LocalDateTime createdAt;
     private double totalOdds;
     private double possibleWin;
+
+    public Bet() {
+    }
 
     public Bet(int betId, int userId, double amount, BetStatus betStatus, LocalDateTime createdAt, double totalOdds, double possibleWin) {
         this.betId = betId;
@@ -25,6 +28,10 @@ public class Bet {
 
     public int getBetId() {
         return betId;
+    }
+
+    public void setBetId(int betId) {
+        this.betId = betId;
     }
 
     public int getUserId() {

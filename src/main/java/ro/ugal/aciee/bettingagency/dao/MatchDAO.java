@@ -9,16 +9,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MatchDAO {
-    public boolean insert(Match match) throws SQLException {
+    public Match save(Match match) throws SQLException {
         String sql = "INSERT INTO MATCH (sport_id, team1_id, team2_id, match_date)" +
                 "VALUES (?, ?, ?, ?)";
         try (Connection con = ConnectionManager.open();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
+             PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, match.getSportId());
             stmt.setInt(2, match.getTeam1Id());
             stmt.setInt(3, match.getTeam2Id());
             stmt.setTimestamp(4, Timestamp.valueOf(match.getMatchDate()));
-            return stmt.executeUpdate() == 1;
+            stmt.executeUpdate();
+            ResultSet keys = stmt.getGeneratedKeys();
+            if (keys.next()) {
+                match.setMatchId(keys.getInt("match_id"));
+            }
+            return match;
         }
     }
 
@@ -87,9 +92,17 @@ public class MatchDAO {
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, matchStatus.name());
             stmt.setInt(2, id);
-            return stmt.executeUpdate() == 1;
+            return stmt.executeUpdate() > 0;
         }
     }
 
+    public boolean delete(int matchId) throws SQLException {
+        String sql = "DELETE FROM MATCH WHERE match_id = ?";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, matchId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
 
 }

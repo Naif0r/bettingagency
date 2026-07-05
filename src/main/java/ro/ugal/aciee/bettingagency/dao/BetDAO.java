@@ -9,29 +9,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BetDAO {
-    public boolean insert(Bet bet) throws SQLException {
+    public Bet save(Bet bet) throws SQLException {
         String sql = "INSERT INTO BET (user_id, amount, bet_status, created_at, total_odds, possible_win)" +
-                     "VALUES (?, ?, ?, ?, ?, ?)";
-        try(Connection con = ConnectionManager.open();
-            PreparedStatement stmt = con.prepareStatement(sql)){
+                "VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, bet.getUserId());
             stmt.setDouble(2, bet.getAmount());
             stmt.setString(3, bet.getBetStatus().name());
             stmt.setTimestamp(4, Timestamp.valueOf(bet.getCreatedAt()));
             stmt.setDouble(5, bet.getTotalOdds());
             stmt.setDouble(6, bet.getPossibleWin());
-            return stmt.executeUpdate() == 1;
+            stmt.executeUpdate();
+            ResultSet keys = stmt.getGeneratedKeys();
+            if (keys.next()) {
+                bet.setBetId(keys.getInt("bet_id"));
+            }
+            return bet;
         }
     }
 
-    public List<Bet> getByUserId(int userId) throws SQLException {
+    public List<Bet> getAll() throws SQLException {
         List<Bet> betList = new ArrayList<>();
-        String sql = "SELECT * FROM BET WHERE user_id = ?";
-        try(Connection con = ConnectionManager.open();
-            PreparedStatement stmt = con.prepareStatement(sql)){
-            stmt.setInt(1, userId);
-            try(ResultSet rs = stmt.executeQuery()){
-                while(rs.next()){
+        String sql = "SELECT * FROM BET";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
                     betList.add(new Bet(rs.getInt("bet_id"),
                             rs.getInt("user_id"),
                             rs.getDouble("amount"),
@@ -43,5 +47,66 @@ public class BetDAO {
             }
         }
         return betList;
+    }
+
+    public List<Bet> getByUserId(int userId) throws SQLException {
+        List<Bet> betList = new ArrayList<>();
+        String sql = "SELECT * FROM BET WHERE user_id = ?";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    betList.add(new Bet(rs.getInt("bet_id"),
+                            rs.getInt("user_id"),
+                            rs.getDouble("amount"),
+                            BetStatus.valueOf(rs.getString("bet_status")),
+                            rs.getTimestamp("created_at").toLocalDateTime(),
+                            rs.getDouble("total_odds"),
+                            rs.getDouble("possible_win")));
+                }
+            }
+        }
+        return betList;
+    }
+
+    public List<Bet> getByStatus(BetStatus betStatus) throws SQLException {
+        List<Bet> betList = new ArrayList<>();
+        String sql = "SELECT * FROM BET WHERE bet_status = ?";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, betStatus.name());
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    betList.add(new Bet(rs.getInt("bet_id"),
+                            rs.getInt("user_id"),
+                            rs.getDouble("amount"),
+                            BetStatus.valueOf(rs.getString("bet_status")),
+                            rs.getTimestamp("created_at").toLocalDateTime(),
+                            rs.getDouble("total_odds"),
+                            rs.getDouble("possible_win")));
+                }
+            }
+        }
+        return betList;
+    }
+
+    public boolean updateStatus(BetStatus betStatus, int betId) throws SQLException {
+        String sql = "UPDATE BET SET bet_status = ? WHERE bet_id = ?";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, betStatus.name());
+            stmt.setInt(2, betId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    public boolean delete(int betId) throws SQLException {
+        String sql = "DELETE FROM BET WHERE bet_id = ?";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, betId);
+            return stmt.executeUpdate() > 0;
+        }
     }
 }

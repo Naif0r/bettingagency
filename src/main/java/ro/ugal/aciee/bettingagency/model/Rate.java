@@ -4,11 +4,14 @@ import ro.ugal.aciee.bettingagency.model.enums.RateStatus;
 import ro.ugal.aciee.bettingagency.model.enums.RateType;
 
 public class Rate {
-    private final int rateId;
+    private int rateId;
     private int matchId;
     private RateType type;
     private double value;
     private RateStatus rateStatus;
+
+    public Rate() {
+    }
 
     public Rate(int rateId, int matchId, RateType type, double value, RateStatus rateStatus) {
         this.rateId = rateId;
@@ -20,6 +23,10 @@ public class Rate {
 
     public int getRateId() {
         return rateId;
+    }
+
+    public void setRateId(int rateId) {
+        this.rateId = rateId;
     }
 
     public int getMatchId() {

@@ -4,12 +4,15 @@ import ro.ugal.aciee.bettingagency.model.enums.AccountStatus;
 import ro.ugal.aciee.bettingagency.model.enums.Role;
 
 public class Account {
-    private final int userId;
+    private int userId;
     private String username;
     private String password;
     private Role role;
     private AccountStatus accountStatus;
     private double balance;
+
+    public Account() {
+    }
 
     public Account(int userId, String username, String password, Role role, AccountStatus accountAccountStatus, double balance) {
         this.userId = userId;
@@ -22,6 +25,10 @@ public class Account {
 
     public int getUserId() {
         return this.userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {
