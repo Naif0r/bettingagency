@@ -10,16 +10,14 @@ import java.util.List;
 
 public class BetDAO {
     public Bet save(Bet bet) throws SQLException {
-        String sql = "INSERT INTO BET (user_id, amount, bet_status, created_at, total_odds, possible_win)" +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO BET (user_id, amount, total_odds, possible_win)" +
+                "VALUES (?, ?, ?, ?)";
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, bet.getUserId());
             stmt.setDouble(2, bet.getAmount());
-            stmt.setString(3, bet.getBetStatus().name());
-            stmt.setTimestamp(4, Timestamp.valueOf(bet.getCreatedAt()));
-            stmt.setDouble(5, bet.getTotalOdds());
-            stmt.setDouble(6, bet.getPossibleWin());
+            stmt.setDouble(3, bet.getTotalOdds());
+            stmt.setDouble(4, bet.getPossibleWin());
             stmt.executeUpdate();
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {
@@ -47,6 +45,27 @@ public class BetDAO {
             }
         }
         return betList;
+    }
+
+    public Bet getByBetId(int betId) throws SQLException {
+        List<Bet> betList = new ArrayList<>();
+        String sql = "SELECT * FROM BET WHERE bet_id = ?";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, betId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Bet(rs.getInt("bet_id"),
+                            rs.getInt("user_id"),
+                            rs.getDouble("amount"),
+                            BetStatus.valueOf(rs.getString("bet_status")),
+                            rs.getTimestamp("created_at").toLocalDateTime(),
+                            rs.getDouble("total_odds"),
+                            rs.getDouble("possible_win"));
+                }
+            }
+        }
+        return null;
     }
 
     public List<Bet> getByUserId(int userId) throws SQLException {

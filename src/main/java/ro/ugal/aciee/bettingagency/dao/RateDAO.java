@@ -65,6 +65,24 @@ public class RateDAO {
         return rateList;
     }
 
+    public Rate getById(int rateId) throws SQLException {
+        String sql = "SELECT * FROM RATE WHERE rate_id = ?";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, rateId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Rate(rs.getInt("rate_id"),
+                            rs.getInt("match_id"),
+                            RateType.valueOf(rs.getString("type")),
+                            rs.getDouble("value"),
+                            RateStatus.valueOf(rs.getString("rate_status")));
+                }
+            }
+        }
+        return null;
+    }
+
     public boolean updateStatus(int rateId, RateStatus rateStatus) throws SQLException {
         String sql = "UPDATE RATE SET rate_status = ? WHERE rate_id = ?";
         try (Connection con = ConnectionManager.open();
