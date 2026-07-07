@@ -1,0 +1,93 @@
+package ro.ugal.aciee.bettingagency.service;
+
+import ro.ugal.aciee.bettingagency.dao.TeamDAO;
+import ro.ugal.aciee.bettingagency.model.Sport;
+import ro.ugal.aciee.bettingagency.model.Team;
+
+import java.sql.SQLException;
+import java.util.List;
+
+public class TeamService {
+    private final TeamDAO teamDAO = new TeamDAO();
+    private final SportService sportService = new SportService();
+
+    public Team save(int sportId, String teamName) throws SQLException {
+        Sport sport = sportService.getById(sportId);
+        if (teamName.isBlank()) {
+            throw new IllegalArgumentException("Team name is empty");
+        }
+        List<Team> teamList = teamDAO.getBySport(sport.getSportName());
+        for (Team teamTest : teamList) {
+            if (teamTest.getTeamName().equals(teamName)) {
+                throw new IllegalArgumentException("There cannot be two identical teams for one sport");
+            }
+        }
+        Team team = new Team();
+        team.setSportId(sportId);
+        team.setTeamName(teamName);
+        return teamDAO.save(team);
+    }
+
+    public List<Team> getAll() throws SQLException {
+        List<Team> teamList = teamDAO.getAll();
+        if (teamList.isEmpty()) {
+            throw new IllegalArgumentException("Team list is empty");
+        }
+        return teamList;
+    }
+
+    public List<Team> getBySport(String sportName) throws SQLException {
+        if (sportName.isBlank()) {
+            throw new IllegalArgumentException("Sport name is blank");
+        }
+        List<Team> teamList = teamDAO.getBySport(sportName);
+        if (teamList.isEmpty()) {
+            throw new IllegalArgumentException("Team list is empty");
+        }
+        return teamList;
+    }
+
+    public Team getById(int teamId) throws SQLException {
+        if (teamId <= 0) {
+            throw new IllegalArgumentException("Incorrect team id");
+        }
+        Team team = teamDAO.getById(teamId);
+        if (team == null) {
+            throw new IllegalArgumentException("Team not found");
+        }
+        return team;
+    }
+
+    public boolean updateTeamName(String newTeamName, int teamId) throws SQLException {
+        if (teamId <= 0) {
+            throw new IllegalArgumentException("Incorrect team id");
+        }
+        if (newTeamName.isBlank()) {
+            throw new IllegalArgumentException("Team name is blank");
+        }
+        Team team = teamDAO.getById(teamId);
+        if (team == null) {
+            throw new IllegalArgumentException("Team not found");
+        }
+        if (team.getTeamName().equals(newTeamName)) {
+            throw new IllegalArgumentException("The new team name should not repeat the old one");
+        }
+        List<Team> teamList = teamDAO.getBySport(sportService.getById(team.getSportId()).getSportName());
+        for (Team teamTest : teamList) {
+            if (teamTest.getTeamName().equals(newTeamName)) {
+                throw new IllegalArgumentException("There cannot be two identical teams for one sport");
+            }
+        }
+        return teamDAO.updateTeamName(newTeamName, teamId);
+    }
+
+    public boolean delete(int teamId) throws SQLException {
+        if (teamId <= 0) {
+            throw new IllegalArgumentException("Incorrect team id");
+        }
+        if (teamDAO.getById(teamId) == null) {
+            throw new IllegalArgumentException("Team not found");
+        }
+        return teamDAO.delete(teamId);
+    }
+}

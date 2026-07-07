@@ -32,7 +32,7 @@ public class BetService {
             throw new IllegalArgumentException("The amount must be greater than 0");
         }
         if (account.getBalance() - amount < 0) {
-            throw new IllegalArgumentException("Insufiicient balance to place a bet");
+            throw new IllegalArgumentException("Insufficient balance to place a bet");
         }
         if (rateId.isEmpty()) {
             throw new IllegalArgumentException("Rate id list is empty");

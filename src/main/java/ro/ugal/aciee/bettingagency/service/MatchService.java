@@ -61,6 +61,17 @@ public class MatchService {
         return matchList;
     }
 
+    public Match getById(int matchId) throws SQLException {
+        if (matchId <= 0){
+            throw new IllegalArgumentException("Incorrect match id");
+        }
+        Match match = matchDAO.getById(matchId);
+        if(match == null){
+            throw new IllegalArgumentException("Match not found");
+        }
+        return match;
+    }
+
     public List<Match> getBySport(String sportName) throws SQLException {
         if (sportName.isBlank()) {
             throw new IllegalArgumentException("Sport name is empty");

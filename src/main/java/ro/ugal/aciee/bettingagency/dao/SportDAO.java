@@ -53,6 +53,21 @@ public class SportDAO {
         return null;
     }
 
+    public Sport getBySportName(String sportName) throws SQLException {
+        String sql = "SELECT * FROM SPORT WHERE sport_name = ?";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, sportName);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Sport(rs.getInt("sport_id"),
+                            rs.getString("sport_name"));
+                }
+            }
+        }
+        return null;
+    }
+
     public boolean update(String sportName, int sportId) throws SQLException {
         String sql = "UPDATE SPORT SET sport_name = ? WHERE sport_id = ?";
         try (Connection con = ConnectionManager.open();
