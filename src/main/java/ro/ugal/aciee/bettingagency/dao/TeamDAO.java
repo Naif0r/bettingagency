@@ -57,6 +57,22 @@ public class TeamDAO {
         return teamList;
     }
 
+    public Team getById(int teamId) throws SQLException {
+        String sql = "SELECT * FROM TEAM WHERE team_id = ?";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, teamId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Team(rs.getInt("team_id"),
+                            rs.getInt("sport_id"),
+                            rs.getString("team_name"));
+                }
+            }
+        }
+        return null;
+    }
+
     public boolean updateTeamName(String teamName, int teamId) throws SQLException {
         String sql = "UPDATE TEAM SET team_name = ? WHERE team_id = ?";
         try (Connection con = ConnectionManager.open();

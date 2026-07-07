@@ -46,6 +46,25 @@ public class MatchDAO {
         return matchList;
     }
 
+    public Match getById(int matchId) throws SQLException {
+        String sql = "SELECT * FROM MATCH WHERE match_id = ?";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, matchId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Match(rs.getInt("match_id"),
+                            rs.getInt("sport_id"),
+                            rs.getInt("team1_id"),
+                            rs.getInt("team2_id"),
+                            rs.getTimestamp("match_date").toLocalDateTime(),
+                            MatchStatus.valueOf(rs.getString("match_status")));
+                }
+            }
+        }
+        return null;
+    }
+
     public List<Match> getBySport(String sportName) throws SQLException {
         List<Match> matchList = new ArrayList<>();
         String sql = "SELECT * FROM MATCH m JOIN SPORT s ON m.sport_id = s.sport_id WHERE s.sport_name = ?";
