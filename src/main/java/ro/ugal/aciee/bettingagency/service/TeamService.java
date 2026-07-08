@@ -13,6 +13,7 @@ public class TeamService {
 
     public Team save(int sportId, String teamName) throws SQLException {
         Sport sport = sportService.getById(sportId);
+        teamName = teamName.trim();
         if (teamName.isBlank()) {
             throw new IllegalArgumentException("Team name is empty");
         }
@@ -37,6 +38,7 @@ public class TeamService {
     }
 
     public List<Team> getBySport(String sportName) throws SQLException {
+        sportName = sportName.trim();
         if (sportName.isBlank()) {
             throw new IllegalArgumentException("Sport name is blank");
         }
@@ -59,15 +61,10 @@ public class TeamService {
     }
 
     public boolean updateTeamName(String newTeamName, int teamId) throws SQLException {
-        if (teamId <= 0) {
-            throw new IllegalArgumentException("Incorrect team id");
-        }
+        newTeamName = newTeamName.trim();
+        Team team = getById(teamId);
         if (newTeamName.isBlank()) {
             throw new IllegalArgumentException("Team name is blank");
-        }
-        Team team = teamDAO.getById(teamId);
-        if (team == null) {
-            throw new IllegalArgumentException("Team not found");
         }
         if (team.getTeamName().equals(newTeamName)) {
             throw new IllegalArgumentException("The new team name should not repeat the old one");
@@ -82,12 +79,7 @@ public class TeamService {
     }
 
     public boolean delete(int teamId) throws SQLException {
-        if (teamId <= 0) {
-            throw new IllegalArgumentException("Incorrect team id");
-        }
-        if (teamDAO.getById(teamId) == null) {
-            throw new IllegalArgumentException("Team not found");
-        }
+        getById(teamId);
         return teamDAO.delete(teamId);
     }
 }

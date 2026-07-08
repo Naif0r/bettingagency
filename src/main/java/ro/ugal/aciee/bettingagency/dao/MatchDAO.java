@@ -10,7 +10,7 @@ import java.util.List;
 
 public class MatchDAO {
     public Match save(Match match) throws SQLException {
-        String sql = "INSERT INTO MATCH (sport_id, team1_id, team2_id, match_date)" +
+        String sql = "INSERT INTO MATCH (sport_id, team1_id, team2_id, match_date, team1_score, team2_score)" +
                 "VALUES (?, ?, ?, ?)";
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -39,7 +39,9 @@ public class MatchDAO {
                             rs.getInt("team1_id"),
                             rs.getInt("team2_id"),
                             rs.getTimestamp("match_date").toLocalDateTime(),
-                            MatchStatus.valueOf(rs.getString("match_status"))));
+                            MatchStatus.valueOf(rs.getString("match_status")),
+                            rs.getInt("team1_score"),
+                            rs.getInt("team2_score")));
                 }
             }
         }
@@ -58,7 +60,9 @@ public class MatchDAO {
                             rs.getInt("team1_id"),
                             rs.getInt("team2_id"),
                             rs.getTimestamp("match_date").toLocalDateTime(),
-                            MatchStatus.valueOf(rs.getString("match_status")));
+                            MatchStatus.valueOf(rs.getString("match_status")),
+                            rs.getInt("team1_score"),
+                            rs.getInt("team2_score"));
                 }
             }
         }
@@ -78,7 +82,9 @@ public class MatchDAO {
                             rs.getInt("team1_id"),
                             rs.getInt("team2_id"),
                             rs.getTimestamp("match_date").toLocalDateTime(),
-                            MatchStatus.valueOf(rs.getString("match_status"))));
+                            MatchStatus.valueOf(rs.getString("match_status")),
+                            rs.getInt("team1_score"),
+                            rs.getInt("team2_score")));
                 }
             }
         }
@@ -98,7 +104,9 @@ public class MatchDAO {
                             rs.getInt("team1_id"),
                             rs.getInt("team2_id"),
                             rs.getTimestamp("match_date").toLocalDateTime(),
-                            MatchStatus.valueOf(rs.getString("match_status"))));
+                            MatchStatus.valueOf(rs.getString("match_status")),
+                            rs.getInt("team1_score"),
+                            rs.getInt("team2_score")));
                 }
             }
         }
@@ -117,6 +125,24 @@ public class MatchDAO {
 
     public boolean delete(int matchId) throws SQLException {
         String sql = "DELETE FROM MATCH WHERE match_id = ?";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, matchId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    public boolean updateScoreTeam1(int matchId) throws SQLException {
+        String sql = "UPDATE MATCH SET team1_score = team1_score + 1 WHERE match_id = ?";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, matchId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    public boolean updateScoreTeam2(int matchId) throws SQLException {
+        String sql = "UPDATE MATCH SET team2_score = team2_score + 1 WHERE match_id = ?";
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, matchId);

@@ -1,12 +1,11 @@
 package ro.ugal.aciee.bettingagency.service;
 
 import ro.ugal.aciee.bettingagency.dao.MatchDAO;
-import ro.ugal.aciee.bettingagency.dao.SportDAO;
-import ro.ugal.aciee.bettingagency.dao.TeamDAO;
 import ro.ugal.aciee.bettingagency.model.Match;
-import ro.ugal.aciee.bettingagency.model.Sport;
 import ro.ugal.aciee.bettingagency.model.Team;
 import ro.ugal.aciee.bettingagency.model.enums.MatchStatus;
+import ro.ugal.aciee.bettingagency.model.enums.MatchTeam;
+import ro.ugal.aciee.bettingagency.model.enums.RateType;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -14,27 +13,18 @@ import java.util.List;
 
 public class MatchService {
     private final MatchDAO matchDAO = new MatchDAO();
-    private final SportDAO sportDAO = new SportDAO();
-    private final TeamDAO teamDAO = new TeamDAO();
+    private final SportService sportService = new SportService();
+    private final TeamService teamService = new TeamService();
 
     public Match save(int sportId, int team1Id, int team2Id, LocalDateTime matchDate) throws SQLException {
-        if (sportId <= 0 || team1Id <= 0 || team2Id <= 0) {
-            throw new IllegalArgumentException("Incorrect id");
-        }
-        Sport sport = sportDAO.getById(sportId);
-        Team team1 = teamDAO.getById(team1Id);
-        Team team2 = teamDAO.getById(team2Id);
-        if (sport == null) {
-            throw new IllegalArgumentException("Sport not found");
-        }
-        if (team1 == null) {
-            throw new IllegalArgumentException("Team1 not found");
-        }
-        if (team2 == null) {
-            throw new IllegalArgumentException("Team2 not found");
-        }
+        sportService.getById(sportId);
+        Team team1 = teamService.getById(team1Id);
+        Team team2 = teamService.getById(team2Id);
         if (matchDate == null) {
             throw new IllegalArgumentException("Time cannot be empty");
+        }
+        if (matchDate.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Match date cannot be in the past");
         }
         if (team1.getSportId() != sportId) {
             throw new IllegalArgumentException("Team1 must be from this sport");
@@ -62,17 +52,18 @@ public class MatchService {
     }
 
     public Match getById(int matchId) throws SQLException {
-        if (matchId <= 0){
+        if (matchId <= 0) {
             throw new IllegalArgumentException("Incorrect match id");
         }
         Match match = matchDAO.getById(matchId);
-        if(match == null){
+        if (match == null) {
             throw new IllegalArgumentException("Match not found");
         }
         return match;
     }
 
     public List<Match> getBySport(String sportName) throws SQLException {
+        sportName = sportName.trim();
         if (sportName.isBlank()) {
             throw new IllegalArgumentException("Sport name is empty");
         }
@@ -95,29 +86,58 @@ public class MatchService {
     }
 
     public boolean updateStatus(MatchStatus matchStatus, int matchId) throws SQLException {
-        if (matchId <= 0) {
-            throw new IllegalArgumentException("Incorrect match id");
-        }
+        Match match = getById(matchId);
         if (matchStatus == null) {
             throw new IllegalArgumentException("Incorrect match status");
         }
-        Match match = matchDAO.getById(matchId);
-        if (match == null) {
-            throw new IllegalArgumentException("Match not found");
-        }
-        if (match.getMatchStatus().equals(matchStatus)) {
+        if (match.getMatchStatus() == matchStatus) {
             throw new IllegalArgumentException("It is not possible to change the status because it is already set");
+        }
+        if (match.getMatchStatus() == MatchStatus.FINISHED) {
+            throw new IllegalArgumentException("The match has already ended, and its status cannot be changed");
+        }
+        if (match.getMatchStatus() == MatchStatus.CANCELLED) {
+            throw new IllegalArgumentException("The match has been canceled, and its status cannot be changed");
+        }
+        if (match.getMatchStatus() == MatchStatus.LIVE) {
+            if (matchStatus == MatchStatus.UPCOMING) {
+                throw new IllegalArgumentException("You cannot change the status from LIVE to UPCOMING");
+            }
         }
         return matchDAO.updateStatus(matchStatus, matchId);
     }
 
+    public boolean updateScoreTeam(int matchId, MatchTeam matchTeam) throws SQLException {
+        getById(matchId);
+        if (matchTeam == null) {
+            throw new IllegalArgumentException("Incorrect match team");
+        }
+        if (matchTeam == MatchTeam.TEAM1) {
+            return matchDAO.updateScoreTeam1(matchId);
+        } else if (matchTeam == MatchTeam.TEAM2) {
+            return matchDAO.updateScoreTeam2(matchId);
+        }
+        throw new IllegalArgumentException("Unknown team");
+    }
+
+    public RateType getWinnerMatch(int matchId) throws SQLException {
+        Match match = getById(matchId);
+        int team1Score = match.getTeam1Score();
+        int team2Score = match.getTeam2Score();
+        if (match.getMatchStatus() != MatchStatus.FINISHED) {
+            throw new IllegalArgumentException("The match must be finished");
+        }
+        if (team1Score > team2Score) {
+            return RateType.WIN1;
+        }
+        if (team1Score == team2Score) {
+            return RateType.DRAW;
+        }
+        return RateType.WIN2;
+    }
+
     public boolean delete(int matchId) throws SQLException {
-        if (matchId <= 0) {
-            throw new IllegalArgumentException("Incorrect match id");
-        }
-        if (matchDAO.getById(matchId) == null) {
-            throw new IllegalArgumentException("Match not found");
-        }
+        getById(matchId);
         return matchDAO.delete(matchId);
     }
 

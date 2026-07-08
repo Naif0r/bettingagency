@@ -11,14 +11,13 @@ import java.util.List;
 
 public class RateDAO {
     public Rate save(Rate rate) throws SQLException {
-        String sql = "INSERT INTO RATE (match_id, type, value, rate_status)" +
-                "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO RATE (match_id, type, value)" +
+                "VALUES (?, ?, ?)";
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, rate.getMatchId());
             stmt.setString(2, rate.getType().name());
             stmt.setDouble(3, rate.getValue());
-            stmt.setString(4, rate.getRateStatus().name());
             stmt.executeUpdate();
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {

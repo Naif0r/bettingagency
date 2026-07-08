@@ -20,13 +20,20 @@ public class AccountService {
     }
 
     public Account getById(int id) throws SQLException {
-        existsId(id);
-        return accountDAO.getById(id);
+        if (id <= 0) {
+            throw new IllegalArgumentException("Invalid id");
+        }
+        Account account = accountDAO.getById(id);
+        if (account == null) {
+            throw new IllegalArgumentException("Account not found");
+        }
+        return account;
     }
 
     public Account getByUsername(String username) throws SQLException {
+        username = username.trim();
         if (username.isBlank()) {
-            throw new IllegalArgumentException("Username is empty");
+            throw new IllegalArgumentException("Username is blank");
         }
         Account account = accountDAO.getByUsername(username);
         if (account == null) {
@@ -36,6 +43,8 @@ public class AccountService {
     }
 
     public Account register(String username, String password, Role role) throws SQLException {
+        username = username.trim();
+        password = password.trim();
         if (username.isBlank()) {
             throw new IllegalArgumentException("Username is empty");
         }
@@ -56,55 +65,71 @@ public class AccountService {
     }
 
     public boolean updateStatus(int id, AccountStatus accountStatus) throws SQLException {
-        existsId(id);
+        Account account = getById(id);
         if (accountStatus == null) {
             throw new IllegalArgumentException("Status is empty");
         }
-        if (accountStatus.equals(accountDAO.getById(id).getAccountStatus())) {
+        if (accountStatus == account.getAccountStatus()) {
             throw new IllegalArgumentException("It is not possible to change the status because it is already set");
         }
         return accountDAO.updateStatus(accountStatus, id);
     }
 
-    public boolean updateUsername(String username, int id) throws SQLException {
-        existsId(id);
-        if (accountDAO.getByUsername(username) != null) {
+    public boolean updateUsername(String newUsername, int id) throws SQLException {
+        Account account = getById(id);
+        newUsername = newUsername.trim();
+        if (newUsername.isBlank()) {
+            throw new IllegalArgumentException("New username is blank");
+        }
+        if (account.getUsername().equals(newUsername)) {
+            throw new IllegalArgumentException("New username must be different from the current username");
+        }
+        if (accountDAO.getByUsername(newUsername) != null) {
             throw new IllegalArgumentException("Username already exists");
         }
-        return accountDAO.updateUsername(username, id);
+        return accountDAO.updateUsername(newUsername, id);
     }
 
-    public boolean updatePassword(String password, int id) throws SQLException {
-        existsId(id);
-        if (password.length() < 8) {
+    public boolean updatePassword(String newPassword, int id) throws SQLException {
+        Account account = getById(id);
+        newPassword = newPassword.trim();
+        if (newPassword.length() < 8) {
             throw new IllegalArgumentException("Password is too short");
         }
-        if (accountDAO.getById(id).getPassword().equals(password)) {
+        if (account.getPassword().equals(newPassword)) {
             throw new IllegalArgumentException("New password must be different from the current password");
         }
-        return accountDAO.updatePassword(password, id);
+        return accountDAO.updatePassword(newPassword, id);
     }
 
     public boolean updateBalance(int id, double balance) throws SQLException {
-        existsId(id);
-        if (balance <= 0) {
-            throw new IllegalArgumentException("Balance must be minim 1");
-        }
+        getById(id);
         return accountDAO.updateBalance(balance, id);
     }
 
+    public boolean deposit(int userId, double amount) throws SQLException {
+        getById(userId);
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Deposit amount must be greater than 0");
+        }
+        return accountDAO.updateBalance(amount, userId);
+    }
+
     public boolean delete(int id) throws SQLException {
-        existsId(id);
+        getById(id);
         return accountDAO.delete(id);
     }
 
-    private void existsId(int id) throws SQLException {
-        if (id <= 0) {
-            throw new IllegalArgumentException("Invalid id");
+    public Account login(String username, String password) throws SQLException {
+        username = username.trim();
+        password = password.trim();
+        if (password.isBlank()) {
+            throw new IllegalArgumentException("Password is blank");
         }
-        Account account = accountDAO.getById(id);
-        if (account == null) {
-            throw new IllegalArgumentException("Account not found");
+        Account account = getByUsername(username);
+        if (!account.getPassword().equals(password)) {
+            throw new IllegalArgumentException("Incorrect password");
         }
+        return account;
     }
 }

@@ -12,7 +12,7 @@ public class RateService {
     private final RateDAO rateDAO = new RateDAO();
     private final MatchService matchService = new MatchService();
 
-    public Rate save(int matchId, RateType type, double value, RateStatus rateStatus) throws SQLException {
+    public Rate save(int matchId, RateType type, double value) throws SQLException {
         matchService.getById(matchId);
         if (type == null) {
             throw new IllegalArgumentException("Type is empty");
@@ -20,22 +20,16 @@ public class RateService {
         if (value <= 1.00) {
             throw new IllegalArgumentException("The coefficient must be greater than 1.00");
         }
-        if (rateStatus == null) {
-            throw new IllegalArgumentException("Rate status is empty");
-        }
         List<Rate> rates = rateDAO.getByMatch(matchId);
-
         for (Rate rate : rates) {
             if (rate.getType() == type) {
-                throw new IllegalArgumentException(
-                        "This rate already exists for the match");
+                throw new IllegalArgumentException("This rate already exists for the match");
             }
         }
         Rate rate = new Rate();
         rate.setMatchId(matchId);
         rate.setType(type);
         rate.setValue(value);
-        rate.setRateStatus(rateStatus);
         return rateDAO.save(rate);
     }
 
@@ -72,7 +66,7 @@ public class RateService {
         if (rateStatus == null) {
             throw new IllegalArgumentException("Rate status is empty");
         }
-        if (rate.getRateStatus().equals(rateStatus)) {
+        if (rate.getRateStatus() == rateStatus) {
             throw new IllegalArgumentException("The status cannot be set because it is already set");
         }
         return rateDAO.updateStatus(rateId, rateStatus);

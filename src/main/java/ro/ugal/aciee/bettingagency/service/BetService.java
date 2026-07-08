@@ -1,49 +1,38 @@
 package ro.ugal.aciee.bettingagency.service;
 
-import ro.ugal.aciee.bettingagency.dao.AccountDAO;
 import ro.ugal.aciee.bettingagency.dao.BetDAO;
 import ro.ugal.aciee.bettingagency.dao.BetRateDAO;
-import ro.ugal.aciee.bettingagency.dao.RateDAO;
-import ro.ugal.aciee.bettingagency.model.Account;
-import ro.ugal.aciee.bettingagency.model.Bet;
-import ro.ugal.aciee.bettingagency.model.BetRate;
-import ro.ugal.aciee.bettingagency.model.Rate;
-import ro.ugal.aciee.bettingagency.model.enums.BetStatus;
-import ro.ugal.aciee.bettingagency.model.enums.RateStatus;
+import ro.ugal.aciee.bettingagency.model.*;
+import ro.ugal.aciee.bettingagency.model.enums.*;
 
 import java.sql.SQLException;
 import java.util.List;
 
 public class BetService {
     private final BetDAO betDAO = new BetDAO();
-    private final AccountDAO accountDAO = new AccountDAO();
+    private final AccountService accountService = new AccountService();
     private final BetRateDAO betRateDAO = new BetRateDAO();
-    private final RateDAO rateDAO = new RateDAO();
+    private final RateService rateService = new RateService();
+    private final MatchService matchService = new MatchService();
 
     public Bet save(int userId, double amount, List<Integer> rateId) throws SQLException {
-        if (userId <= 0) {
-            throw new IllegalArgumentException("Incorrect user id");
-        }
-        Account account = accountDAO.getById(userId);
-        if (account == null) {
-            throw new IllegalArgumentException("Account not found");
-        }
+        Account account = accountService.getById(userId);
         if (amount <= 0) {
             throw new IllegalArgumentException("The amount must be greater than 0");
         }
-        if (account.getBalance() - amount < 0) {
+        if (account.getBalance() < amount) {
             throw new IllegalArgumentException("Insufficient balance to place a bet");
+        }
+        if (account.getAccountStatus() == AccountStatus.BANNED) {
+            throw new IllegalArgumentException("The account is blocked and cannot place bets");
         }
         if (rateId.isEmpty()) {
             throw new IllegalArgumentException("Rate id list is empty");
         }
         double totalOdds = 1;
         for (int id : rateId) {
-            Rate rate = rateDAO.getById(id);
-            if (rate == null) {
-                throw new IllegalArgumentException("Rate not found");
-            }
-            if (rate.getRateStatus().equals(RateStatus.CLOSED)) {
+            Rate rate = rateService.getById(id);
+            if (rate.getRateStatus() == RateStatus.CLOSED) {
                 throw new IllegalArgumentException("Rate is closed");
             }
             totalOdds *= rate.getValue();
@@ -55,7 +44,7 @@ public class BetService {
         bet.setTotalOdds(totalOdds);
         bet.setPossibleWin(possibleWin);
         bet = betDAO.save(bet);
-        accountDAO.updateBalance(-amount, userId);
+        accountService.updateBalance(userId, -amount);
         for (int id : rateId) {
             BetRate betRate = new BetRate(bet.getBetId(), id);
             betRateDAO.save(betRate);
@@ -71,12 +60,21 @@ public class BetService {
         return betList;
     }
 
-    public List<Bet> getByUserId(int userId) throws SQLException {
-        if (userId <= 0) {
-            throw new IllegalArgumentException("Incorrect user id");
+    public Bet getByBetId(int betId) throws SQLException {
+        if (betId <= 0) {
+            throw new IllegalArgumentException("Incorrect bet id");
         }
-        List<Bet> betList = betDAO.getByUserId(userId);
-        if(betList.isEmpty()){
+        Bet bet = betDAO.getByBetId(betId);
+        if (bet == null) {
+            throw new IllegalArgumentException("Bet not found");
+        }
+        return bet;
+    }
+
+    public List<Bet> getByUserId(int userId) throws SQLException {
+        Account account = accountService.getById(userId);
+        List<Bet> betList = betDAO.getByUserId(account.getUserId());
+        if (betList.isEmpty()) {
             throw new IllegalArgumentException("Bet list is empty");
         }
         return betList;
@@ -87,38 +85,75 @@ public class BetService {
             throw new IllegalArgumentException("Incorrect bet status");
         }
         List<Bet> betList = betDAO.getByStatus(betStatus);
-        if(betList.isEmpty()){
+        if (betList.isEmpty()) {
             throw new IllegalArgumentException("Bet list is empty");
         }
         return betList;
     }
 
     public boolean updateStatus(int betId, BetStatus betStatus) throws SQLException {
-        if (betId <= 0) {
-            throw new IllegalArgumentException("Incorrect bet id");
-        }
-        Bet bet = betDAO.getByBetId(betId);
-        if (bet == null) {
-            throw new IllegalArgumentException("Bet not found");
-        }
+        Bet bet = getByBetId(betId);
         if (betStatus == null) {
             throw new IllegalArgumentException("Incorrect bet status");
         }
-        if (bet.getBetStatus().equals(betStatus)) {
+        if (bet.getBetStatus() == betStatus) {
             throw new IllegalArgumentException("It is not possible to change the status because it is already set");
         }
-
         return betDAO.updateStatus(betStatus, betId);
     }
 
     public boolean delete(int betId) throws SQLException {
-        if (betId <= 0) {
-            throw new IllegalArgumentException("Incorrect bet id");
-        }
-        Bet bet = betDAO.getByBetId(betId);
-        if (bet == null) {
-            throw new IllegalArgumentException("Bet not found");
-        }
+        getByBetId(betId);
         return betDAO.delete(betId);
+    }
+
+    public BetStatus calculateBetStatus(int betId) throws SQLException {
+        getByBetId(betId);
+        List<Rate> rateList = betRateDAO.getByBetId(betId);
+        if (rateList.isEmpty()) {
+            throw new IllegalArgumentException("Rate list is empty");
+        }
+        for (Rate rate : rateList) {
+            Match match = matchService.getById(rate.getMatchId());
+            if (match.getMatchStatus() == MatchStatus.CANCELLED) {
+                return BetStatus.CANCELED;
+            }
+            if (match.getMatchStatus() != MatchStatus.FINISHED) {
+                throw new IllegalArgumentException("Match must be finished");
+            }
+            RateType winner = matchService.getWinnerMatch(match.getMatchId());
+            if (winner != rate.getType()) {
+                return BetStatus.LOST;
+            }
+        }
+        return BetStatus.WON;
+    }
+
+    public boolean settleBet(int betId) throws SQLException {
+        Bet bet = getByBetId(betId);
+        if (bet.getBetStatus() != BetStatus.PENDING) {
+            throw new IllegalArgumentException("Bet has already been settled");
+        }
+        BetStatus betStatus = calculateBetStatus(betId);
+        if (!betDAO.updateStatus(betStatus, betId)) {
+            return false;
+        }
+        if (betStatus == BetStatus.WON) {
+            return accountService.updateBalance(bet.getUserId(), bet.getPossibleWin());
+        } else if (betStatus == BetStatus.CANCELED) {
+            return accountService.updateBalance(bet.getUserId(), bet.getAmount());
+        }
+        return false;
+    }
+
+    public boolean settleBetCashOut(int betId) throws SQLException {
+        Bet bet = getByBetId(betId);
+        if (bet.getBetStatus() != BetStatus.PENDING) {
+            throw new IllegalArgumentException("Bet has already been settled");
+        }
+        if (!betDAO.updateStatus(BetStatus.CASHED_OUT, betId)) {
+            return false;
+        }
+        return accountService.updateBalance(bet.getUserId(), bet.getAmount() * 0.7);
     }
 }

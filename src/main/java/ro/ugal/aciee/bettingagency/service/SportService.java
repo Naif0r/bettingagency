@@ -10,6 +10,7 @@ public class SportService {
     private final SportDAO sportDAO = new SportDAO();
 
     public Sport save(String sportName) throws SQLException {
+        sportName = sportName.trim();
         if (sportName.isBlank()) {
             throw new IllegalArgumentException("Sport name is empty");
         }
@@ -40,29 +41,23 @@ public class SportService {
         return sport;
     }
 
-    public boolean updateSportName(String sportName, int sportId) throws SQLException {
-        if (sportId <= 0) {
-            throw new IllegalArgumentException("Incorrect sport id");
-        }
-        if (sportName.isBlank()) {
+    public boolean updateSportName(String newSportName, int sportId) throws SQLException {
+        Sport sport = getById(sportId);
+        newSportName = newSportName.trim();
+        if (newSportName.isBlank()) {
             throw new IllegalArgumentException("Sport name is empty");
         }
-        Sport sport = sportDAO.getById(sportId);
-        if (sport == null) {
-            throw new IllegalArgumentException("Sport not found");
+        if (sport.getSportName().equals(newSportName)) {
+            throw new IllegalArgumentException("The new sport name must be different from the current one");
         }
-        return sportDAO.update(sportName, sportId);
+        if (sportDAO.getBySportName(newSportName) != null) {
+            throw new IllegalArgumentException("Сannot use a name that already exists in the database");
+        }
+        return sportDAO.update(newSportName, sportId);
     }
 
     public boolean delete(int sportId) throws SQLException {
-        if (sportId <= 0) {
-            throw new IllegalArgumentException("Incorrect sport id");
-        }
-        if (sportDAO.getById(sportId) == null) {
-            throw new IllegalArgumentException("Sport not found");
-        }
+        getById(sportId);
         return sportDAO.delete(sportId);
     }
-
-
 }

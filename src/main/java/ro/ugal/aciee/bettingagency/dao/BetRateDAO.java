@@ -1,6 +1,9 @@
 package ro.ugal.aciee.bettingagency.dao;
 
 import ro.ugal.aciee.bettingagency.model.BetRate;
+import ro.ugal.aciee.bettingagency.model.Rate;
+import ro.ugal.aciee.bettingagency.model.enums.RateStatus;
+import ro.ugal.aciee.bettingagency.model.enums.RateType;
 import ro.ugal.aciee.bettingagency.utils.ConnectionManager;
 
 import java.sql.Connection;
@@ -23,36 +26,38 @@ public class BetRateDAO {
         }
     }
 
-    public List<BetRate> getByBetId(int betId) throws SQLException {
-        List<BetRate> betRateList = new ArrayList<>();
-        String sql = "SELECT * FROM BET_RATE WHERE bet_id = ?";
+    public List<Rate> getByBetId(int betId) throws SQLException {
+        List<Rate> rateList = new ArrayList<>();
+        String sql = "SELECT r.* FROM BET_RATE b JOIN RATE r ON b.rate_id = r.rate_id WHERE b.bet_id = ?";
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, betId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    betRateList.add(new BetRate(rs.getInt("bet_id"),
-                            rs.getInt("rate_id")));
+                    rateList.add(new Rate(rs.getInt("rate_id"),
+                            rs.getInt("match_id"),
+                            RateType.valueOf(rs.getString("type")),
+                            rs.getDouble("value"),
+                            RateStatus.valueOf(rs.getString("rate_status"))));
                 }
             }
         }
-        return betRateList;
+        return rateList;
     }
 
-    public List<BetRate> getByRateId(int rateId) throws SQLException {
-        List<BetRate> betRateList = new ArrayList<>();
+    public List<Integer> getByRateId(int rateId) throws SQLException {
+        List<Integer> betIdList = new ArrayList<>();
         String sql = "SELECT * FROM BET_RATE WHERE rate_id = ?";
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, rateId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    betRateList.add(new BetRate(rs.getInt("bet_id"),
-                            rs.getInt("rate_id")));
+                    betIdList.add(rs.getInt("bet_id"));
                 }
             }
         }
-        return betRateList;
+        return betIdList;
     }
 
     public boolean delete(int betId, int rateId) throws SQLException {
