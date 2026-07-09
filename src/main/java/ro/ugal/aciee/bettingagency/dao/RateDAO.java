@@ -3,7 +3,7 @@ package ro.ugal.aciee.bettingagency.dao;
 import ro.ugal.aciee.bettingagency.model.Rate;
 import ro.ugal.aciee.bettingagency.model.enums.RateStatus;
 import ro.ugal.aciee.bettingagency.model.enums.RateType;
-import ro.ugal.aciee.bettingagency.utils.ConnectionManager;
+import ro.ugal.aciee.bettingagency.utils.database.ConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -34,11 +34,7 @@ public class RateDAO {
              PreparedStatement stmt = con.prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    rateList.add(new Rate(rs.getInt("rate_id"),
-                            rs.getInt("match_id"),
-                            RateType.valueOf(rs.getString("type")),
-                            rs.getDouble("value"),
-                            RateStatus.valueOf(rs.getString("rate_status"))));
+                    rateList.add(mapRate(rs));
                 }
             }
         }
@@ -53,11 +49,7 @@ public class RateDAO {
             stmt.setInt(1, matchId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    rateList.add(new Rate(rs.getInt("rate_id"),
-                            rs.getInt("match_id"),
-                            RateType.valueOf(rs.getString("type")),
-                            rs.getDouble("value"),
-                            RateStatus.valueOf(rs.getString("rate_status"))));
+                    rateList.add(mapRate(rs));
                 }
             }
         }
@@ -71,11 +63,7 @@ public class RateDAO {
             stmt.setInt(1, rateId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Rate(rs.getInt("rate_id"),
-                            rs.getInt("match_id"),
-                            RateType.valueOf(rs.getString("type")),
-                            rs.getDouble("value"),
-                            RateStatus.valueOf(rs.getString("rate_status")));
+                    return mapRate(rs);
                 }
             }
         }
@@ -99,5 +87,13 @@ public class RateDAO {
             stmt.setInt(1, rateId);
             return stmt.executeUpdate() > 0;
         }
+    }
+
+    private Rate mapRate(ResultSet rs) throws SQLException {
+        return new Rate(rs.getInt("rate_id"),
+                rs.getInt("match_id"),
+                RateType.valueOf(rs.getString("type")),
+                rs.getDouble("value"),
+                RateStatus.valueOf(rs.getString("rate_status")));
     }
 }

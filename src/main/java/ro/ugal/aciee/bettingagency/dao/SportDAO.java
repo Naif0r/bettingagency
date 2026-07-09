@@ -1,7 +1,7 @@
 package ro.ugal.aciee.bettingagency.dao;
 
 import ro.ugal.aciee.bettingagency.model.Sport;
-import ro.ugal.aciee.bettingagency.utils.ConnectionManager;
+import ro.ugal.aciee.bettingagency.utils.database.ConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -30,8 +30,7 @@ public class SportDAO {
              PreparedStatement stmt = con.prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    sportList.add(new Sport(rs.getInt("sport_id"),
-                            rs.getString("sport_name")));
+                    sportList.add(mapSport(rs));
                 }
             }
         }
@@ -45,8 +44,7 @@ public class SportDAO {
             stmt.setInt(1, sportId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Sport(rs.getInt("sport_id"),
-                            rs.getString("sport_name"));
+                    return mapSport(rs);
                 }
             }
         }
@@ -60,8 +58,7 @@ public class SportDAO {
             stmt.setString(1, sportName);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Sport(rs.getInt("sport_id"),
-                            rs.getString("sport_name"));
+                    return mapSport(rs);
                 }
             }
         }
@@ -87,5 +84,8 @@ public class SportDAO {
         }
     }
 
-
+    private Sport mapSport(ResultSet rs) throws SQLException {
+        return new Sport(rs.getInt("sport_id"),
+                rs.getString("sport_name"));
+    }
 }

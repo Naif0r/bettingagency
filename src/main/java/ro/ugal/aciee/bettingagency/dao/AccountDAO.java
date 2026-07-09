@@ -3,7 +3,7 @@ package ro.ugal.aciee.bettingagency.dao;
 import ro.ugal.aciee.bettingagency.model.Account;
 import ro.ugal.aciee.bettingagency.model.enums.AccountStatus;
 import ro.ugal.aciee.bettingagency.model.enums.Role;
-import ro.ugal.aciee.bettingagency.utils.ConnectionManager;
+import ro.ugal.aciee.bettingagency.utils.database.ConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,12 +17,7 @@ public class AccountDAO {
              PreparedStatement stmt = con.prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    accountList.add(new Account(rs.getInt("user_id"),
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            Role.valueOf(rs.getString("role")),
-                            AccountStatus.valueOf(rs.getString("account_status")),
-                            rs.getDouble("balance")));
+                    accountList.add(mapAccount(rs));
                 }
             }
         }
@@ -36,14 +31,7 @@ public class AccountDAO {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Account(
-                            rs.getInt("user_id"),
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            Role.valueOf(rs.getString("role")),
-                            AccountStatus.valueOf(rs.getString("account_status")),
-                            rs.getDouble("balance")
-                    );
+                    return mapAccount(rs);
                 }
             }
         }
@@ -57,14 +45,7 @@ public class AccountDAO {
             stmt.setString(1, username);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Account(
-                            rs.getInt("user_id"),
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            Role.valueOf(rs.getString("role")),
-                            AccountStatus.valueOf(rs.getString("account_status")),
-                            rs.getDouble("balance")
-                    );
+                    return mapAccount(rs);
                 }
             }
         }
@@ -135,5 +116,15 @@ public class AccountDAO {
             stmt.setInt(1, id);
             return stmt.executeUpdate() > 0;
         }
+    }
+
+    private Account mapAccount(ResultSet rs) throws SQLException {
+        return new Account(
+                rs.getInt("user_id"),
+                rs.getString("username"),
+                rs.getString("password"),
+                Role.valueOf(rs.getString("role")),
+                AccountStatus.valueOf(rs.getString("account_status")),
+                rs.getDouble("balance"));
     }
 }

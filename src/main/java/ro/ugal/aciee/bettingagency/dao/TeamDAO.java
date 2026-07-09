@@ -1,7 +1,7 @@
 package ro.ugal.aciee.bettingagency.dao;
 
 import ro.ugal.aciee.bettingagency.model.Team;
-import ro.ugal.aciee.bettingagency.utils.ConnectionManager;
+import ro.ugal.aciee.bettingagency.utils.database.ConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -31,9 +31,7 @@ public class TeamDAO {
              PreparedStatement stmt = con.prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    teamList.add(new Team(rs.getInt("team_id"),
-                            rs.getInt("sport_id"),
-                            rs.getString("team_name")));
+                    teamList.add(mapTeam(rs));
                 }
             }
         }
@@ -48,9 +46,7 @@ public class TeamDAO {
             stmt.setString(1, sportName);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    teamList.add(new Team(rs.getInt("team_id"),
-                            rs.getInt("sport_id"),
-                            rs.getString("team_name")));
+                    teamList.add(mapTeam(rs));
                 }
             }
         }
@@ -64,9 +60,7 @@ public class TeamDAO {
             stmt.setInt(1, teamId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Team(rs.getInt("team_id"),
-                            rs.getInt("sport_id"),
-                            rs.getString("team_name"));
+                    return mapTeam(rs);
                 }
             }
         }
@@ -90,6 +84,12 @@ public class TeamDAO {
             stmt.setInt(1, teamId);
             return stmt.executeUpdate() > 0;
         }
+    }
+
+    private Team mapTeam(ResultSet rs) throws SQLException {
+        return new Team(rs.getInt("team_id"),
+                rs.getInt("sport_id"),
+                rs.getString("team_name"));
     }
 
 }

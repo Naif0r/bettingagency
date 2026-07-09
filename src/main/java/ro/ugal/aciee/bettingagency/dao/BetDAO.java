@@ -2,7 +2,7 @@ package ro.ugal.aciee.bettingagency.dao;
 
 import ro.ugal.aciee.bettingagency.model.Bet;
 import ro.ugal.aciee.bettingagency.model.enums.BetStatus;
-import ro.ugal.aciee.bettingagency.utils.ConnectionManager;
+import ro.ugal.aciee.bettingagency.utils.database.ConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -34,13 +34,7 @@ public class BetDAO {
              PreparedStatement stmt = con.prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    betList.add(new Bet(rs.getInt("bet_id"),
-                            rs.getInt("user_id"),
-                            rs.getDouble("amount"),
-                            BetStatus.valueOf(rs.getString("bet_status")),
-                            rs.getTimestamp("created_at").toLocalDateTime(),
-                            rs.getDouble("total_odds"),
-                            rs.getDouble("possible_win")));
+                    betList.add(mapBet(rs));
                 }
             }
         }
@@ -55,13 +49,7 @@ public class BetDAO {
             stmt.setInt(1, betId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Bet(rs.getInt("bet_id"),
-                            rs.getInt("user_id"),
-                            rs.getDouble("amount"),
-                            BetStatus.valueOf(rs.getString("bet_status")),
-                            rs.getTimestamp("created_at").toLocalDateTime(),
-                            rs.getDouble("total_odds"),
-                            rs.getDouble("possible_win"));
+                    return mapBet(rs);
                 }
             }
         }
@@ -76,13 +64,7 @@ public class BetDAO {
             stmt.setInt(1, userId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    betList.add(new Bet(rs.getInt("bet_id"),
-                            rs.getInt("user_id"),
-                            rs.getDouble("amount"),
-                            BetStatus.valueOf(rs.getString("bet_status")),
-                            rs.getTimestamp("created_at").toLocalDateTime(),
-                            rs.getDouble("total_odds"),
-                            rs.getDouble("possible_win")));
+                    betList.add(mapBet(rs));
                 }
             }
         }
@@ -97,13 +79,7 @@ public class BetDAO {
             stmt.setString(1, betStatus.name());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    betList.add(new Bet(rs.getInt("bet_id"),
-                            rs.getInt("user_id"),
-                            rs.getDouble("amount"),
-                            BetStatus.valueOf(rs.getString("bet_status")),
-                            rs.getTimestamp("created_at").toLocalDateTime(),
-                            rs.getDouble("total_odds"),
-                            rs.getDouble("possible_win")));
+                    betList.add(mapBet(rs));
                 }
             }
         }
@@ -127,5 +103,15 @@ public class BetDAO {
             stmt.setInt(1, betId);
             return stmt.executeUpdate() > 0;
         }
+    }
+
+    private Bet mapBet(ResultSet rs) throws SQLException {
+        return new Bet(rs.getInt("bet_id"),
+                rs.getInt("user_id"),
+                rs.getDouble("amount"),
+                BetStatus.valueOf(rs.getString("bet_status")),
+                rs.getTimestamp("created_at").toLocalDateTime(),
+                rs.getDouble("total_odds"),
+                rs.getDouble("possible_win"));
     }
 }

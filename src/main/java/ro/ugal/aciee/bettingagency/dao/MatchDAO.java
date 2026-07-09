@@ -2,7 +2,7 @@ package ro.ugal.aciee.bettingagency.dao;
 
 import ro.ugal.aciee.bettingagency.model.Match;
 import ro.ugal.aciee.bettingagency.model.enums.MatchStatus;
-import ro.ugal.aciee.bettingagency.utils.ConnectionManager;
+import ro.ugal.aciee.bettingagency.utils.database.ConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -34,14 +34,7 @@ public class MatchDAO {
              PreparedStatement stmt = con.prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    matchList.add(new Match(rs.getInt("match_id"),
-                            rs.getInt("sport_id"),
-                            rs.getInt("team1_id"),
-                            rs.getInt("team2_id"),
-                            rs.getTimestamp("match_date").toLocalDateTime(),
-                            MatchStatus.valueOf(rs.getString("match_status")),
-                            rs.getInt("team1_score"),
-                            rs.getInt("team2_score")));
+                    matchList.add(mapMatch(rs));
                 }
             }
         }
@@ -55,14 +48,7 @@ public class MatchDAO {
             stmt.setInt(1, matchId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Match(rs.getInt("match_id"),
-                            rs.getInt("sport_id"),
-                            rs.getInt("team1_id"),
-                            rs.getInt("team2_id"),
-                            rs.getTimestamp("match_date").toLocalDateTime(),
-                            MatchStatus.valueOf(rs.getString("match_status")),
-                            rs.getInt("team1_score"),
-                            rs.getInt("team2_score"));
+                    return mapMatch(rs);
                 }
             }
         }
@@ -77,14 +63,7 @@ public class MatchDAO {
             stmt.setString(1, sportName);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    matchList.add(new Match(rs.getInt("match_id"),
-                            rs.getInt("sport_id"),
-                            rs.getInt("team1_id"),
-                            rs.getInt("team2_id"),
-                            rs.getTimestamp("match_date").toLocalDateTime(),
-                            MatchStatus.valueOf(rs.getString("match_status")),
-                            rs.getInt("team1_score"),
-                            rs.getInt("team2_score")));
+                    matchList.add(mapMatch(rs));
                 }
             }
         }
@@ -99,14 +78,7 @@ public class MatchDAO {
             stmt.setString(1, matchStatus.name());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    matchList.add(new Match(rs.getInt("match_id"),
-                            rs.getInt("sport_id"),
-                            rs.getInt("team1_id"),
-                            rs.getInt("team2_id"),
-                            rs.getTimestamp("match_date").toLocalDateTime(),
-                            MatchStatus.valueOf(rs.getString("match_status")),
-                            rs.getInt("team1_score"),
-                            rs.getInt("team2_score")));
+                    matchList.add(mapMatch(rs));
                 }
             }
         }
@@ -150,4 +122,14 @@ public class MatchDAO {
         }
     }
 
+    private Match mapMatch(ResultSet rs) throws SQLException {
+        return new Match(rs.getInt("match_id"),
+                rs.getInt("sport_id"),
+                rs.getInt("team1_id"),
+                rs.getInt("team2_id"),
+                rs.getTimestamp("match_date").toLocalDateTime(),
+                MatchStatus.valueOf(rs.getString("match_status")),
+                rs.getInt("team1_score"),
+                rs.getInt("team2_score"));
+    }
 }
