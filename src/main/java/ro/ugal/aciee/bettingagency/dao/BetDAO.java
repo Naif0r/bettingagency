@@ -71,12 +71,13 @@ public class BetDAO {
         return betList;
     }
 
-    public List<Bet> getByStatus(BetStatus betStatus) throws SQLException {
+    public List<Bet> getByStatus(BetStatus betStatus, int userId) throws SQLException {
         List<Bet> betList = new ArrayList<>();
-        String sql = "SELECT * FROM BET WHERE bet_status = ?";
+        String sql = "SELECT * FROM BET WHERE bet_status = ? AND user_id = ?";
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, betStatus.name());
+            stmt.setInt(2, userId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     betList.add(mapBet(rs));

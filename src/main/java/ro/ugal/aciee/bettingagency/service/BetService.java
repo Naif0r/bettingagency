@@ -26,6 +26,7 @@ public class BetService {
         if (account.getAccountStatus() == AccountStatus.BANNED) {
             throw new IllegalArgumentException("The account is blocked and cannot place bets");
         }
+
         if (rateId.isEmpty()) {
             throw new IllegalArgumentException("Rate id list is empty");
         }
@@ -34,6 +35,10 @@ public class BetService {
             Rate rate = rateService.getById(id);
             if (rate.getRateStatus() == RateStatus.CLOSED) {
                 throw new IllegalArgumentException("Rate is closed");
+            }
+            Match match = matchService.getById(rate.getMatchId());
+            if(match.getMatchStatus() == MatchStatus.FINISHED){
+                throw new IllegalArgumentException("Match is finished");
             }
             totalOdds *= rate.getValue();
         }
@@ -80,15 +85,25 @@ public class BetService {
         return betList;
     }
 
-    public List<Bet> getByStatus(BetStatus betStatus) throws SQLException {
+    public List<Bet> getByStatus(BetStatus betStatus, int userId) throws SQLException {
+        accountService.getById(userId);
         if (betStatus == null) {
             throw new IllegalArgumentException("Incorrect bet status");
         }
-        List<Bet> betList = betDAO.getByStatus(betStatus);
+        List<Bet> betList = betDAO.getByStatus(betStatus, userId);
         if (betList.isEmpty()) {
             throw new IllegalArgumentException("Bet list is empty");
         }
         return betList;
+    }
+
+    public List<Rate> getRateByBetId(int betId) throws SQLException{
+        getByBetId(betId);
+        List<Rate> rateList = betRateDAO.getByBetId(betId);
+        if(rateList.isEmpty()){
+            throw new IllegalArgumentException("Rate list is empty");
+        }
+        return rateList;
     }
 
     public boolean updateStatus(int betId, BetStatus betStatus) throws SQLException {
