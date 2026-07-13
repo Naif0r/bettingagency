@@ -1,12 +1,12 @@
 package ro.ugal.aciee.bettingagency.ui.panels;
 
 import ro.ugal.aciee.bettingagency.model.Match;
-import ro.ugal.aciee.bettingagency.model.Rate;
 import ro.ugal.aciee.bettingagency.model.Team;
+import ro.ugal.aciee.bettingagency.model.enums.MatchTeam;
 import ro.ugal.aciee.bettingagency.service.MatchService;
 import ro.ugal.aciee.bettingagency.service.RateService;
 import ro.ugal.aciee.bettingagency.service.TeamService;
-import ro.ugal.aciee.bettingagency.ui.BetSlip;
+import ro.ugal.aciee.bettingagency.ui.dialogs.admin.ChangeStatusMatchDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,16 +14,16 @@ import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class HomePanel extends JPanel {
+public class HomeAdminPanel extends JPanel {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("d.M.yyyy, HH:mm");
-    private final MatchService matchService = new MatchService();
-    private final RatePanel ratePanel = new RatePanel();
     private final JPanel centerMatchesPanel;
     private final TeamService teamService = new TeamService();
     private final RateService rateService = new RateService();
+    private final MatchService matchService = new MatchService();
 
-    public HomePanel() {
+    public HomeAdminPanel() {
         setLayout(new BorderLayout());
+        //add(new JLabel("Admin panel — здесь будет управление матчами", SwingConstants.CENTER), BorderLayout.CENTER);
 
         centerMatchesPanel = new JPanel();
         centerMatchesPanel.setLayout(new GridLayout(0, 3, 15, 15));
@@ -91,22 +91,18 @@ public class HomePanel extends JPanel {
         centerPanel.add(score, BorderLayout.EAST);
 
         JPanel bottom = new JPanel(new FlowLayout());
-        List<Rate> rates = rateService.getByMatchId(match.getMatchId());
-        for (Rate rate : rates) {
-            JButton button = new JButton(rate.getType() + "  " + rate.getValue());
-            button.addActionListener(e -> {
-                try {
-                    boolean added = BetSlip.add(rate.getRateId());
-                    if (!added) {
-                        JOptionPane.showMessageDialog(this, "It is impossible to add this odds to the bet");
-                    }
-                    ratePanel.launch();
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(this, ex.getMessage());
-                }
-            });
-            bottom.add(button);
-        }
+
+        JButton addScoreTeam1 = new JButton("+TEAM1");
+        addScoreTeam1.addActionListener(e -> addScore(match.getMatchId(), MatchTeam.TEAM1));
+        bottom.add(addScoreTeam1);
+
+        JButton updateStatusMatch = new JButton("Update Status");
+        updateStatusMatch.addActionListener(e -> updateStatusMatchById(match.getMatchId()));
+        bottom.add(updateStatusMatch);
+
+        JButton addScoreTeam2 = new JButton("TEAM2+");
+        addScoreTeam2.addActionListener(e -> addScore(match.getMatchId(), MatchTeam.TEAM2));
+        bottom.add(addScoreTeam2);
 
         matchPanel.add(top, BorderLayout.NORTH);
         matchPanel.add(centerPanel, BorderLayout.CENTER);
@@ -115,11 +111,25 @@ public class HomePanel extends JPanel {
         return matchPanel;
     }
 
-    private void defaultMatches(){
+    private void addScore(int matchId, MatchTeam matchTeam) {
+        try {
+            matchService.updateScoreTeam(matchId, matchTeam);
+            defaultMatches();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Score error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void updateStatusMatchById(int matchId) {
+        ChangeStatusMatchDialog dialog = new ChangeStatusMatchDialog(matchId, this::defaultMatches);
+        dialog.setVisible(true);
+    }
+
+    private void defaultMatches() {
         try {
             updateMatchesDisplay(matchService.getByExistsStatus());
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(this, e.getMessage());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Matches error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

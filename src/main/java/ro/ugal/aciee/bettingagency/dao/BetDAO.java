@@ -73,11 +73,32 @@ public class BetDAO {
 
     public List<Bet> getByStatus(BetStatus betStatus, int userId) throws SQLException {
         List<Bet> betList = new ArrayList<>();
-        String sql = "SELECT * FROM BET WHERE bet_status = ? AND user_id = ?";
+        String sql = "SELECT * FROM BET WHERE bet_status = ? AND user_id = ? ORDER BY created_at DESC";
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, betStatus.name());
             stmt.setInt(2, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    betList.add(mapBet(rs));
+                }
+            }
+        }
+        return betList;
+    }
+
+    public List<Bet> getAllBetByMatch(int matchId) throws SQLException {
+        List<Bet> betList = new ArrayList<>();
+        String sql = """
+                    SELECT b.* FROM BET b 
+                    JOIN BET_RATE br ON b.bet_id = br.bet_id
+                    JOIN RATE r ON br.rate_id = r.rate_id
+                    JOIN MATCH m ON r.match_id = m.match_id
+                    WHERE m.match_id = ?;
+""";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, matchId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     betList.add(mapBet(rs));

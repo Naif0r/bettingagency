@@ -2,6 +2,7 @@ package ro.ugal.aciee.bettingagency.ui.dialogs;
 
 import ro.ugal.aciee.bettingagency.model.Account;
 import ro.ugal.aciee.bettingagency.model.Bet;
+import ro.ugal.aciee.bettingagency.model.enums.AccountStatus;
 import ro.ugal.aciee.bettingagency.model.enums.BetStatus;
 import ro.ugal.aciee.bettingagency.service.BetService;
 import ro.ugal.aciee.bettingagency.ui.Session;
@@ -44,8 +45,24 @@ public class StatisticAccountDialog extends JDialog {
         betStatPanel.add(loseBetLabel);
         center.add(betStatPanel, BorderLayout.EAST);
 
+        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
+        bottom.add(new JLabel("Account status: "));
+
+        AccountStatus accountStatus = account.getAccountStatus();
+
+        JLabel status = new JLabel(String.valueOf(accountStatus));
+
+        if (accountStatus == AccountStatus.ACTIVE) {
+            status.setForeground(Color.GREEN);
+        } else {
+            status.setForeground(Color.RED);
+        }
+
+        bottom.add(status);
+
         statisticPanel.add(top, BorderLayout.NORTH);
         statisticPanel.add(center, BorderLayout.CENTER);
+        statisticPanel.add(bottom, BorderLayout.SOUTH);
 
         add(statisticPanel);
     }

@@ -106,6 +106,11 @@ public class BetService {
         return rateList;
     }
 
+    public List<Bet> getAllBetByMatchId(int matchId) throws SQLException {
+        matchService.getById(matchId);
+        return betDAO.getAllBetByMatch(matchId);
+    }
+
     public boolean updateStatus(int betId, BetStatus betStatus) throws SQLException {
         Bet bet = getByBetId(betId);
         if (betStatus == null) {
@@ -150,9 +155,9 @@ public class BetService {
             throw new IllegalArgumentException("Bet has already been settled");
         }
         BetStatus betStatus = calculateBetStatus(betId);
-        if (!betDAO.updateStatus(betStatus, betId)) {
-            return false;
-        }
+
+        updateStatus(betId, betStatus);
+
         if (betStatus == BetStatus.WON) {
             return accountService.updateBalance(bet.getUserId(), bet.getPossibleWin());
         } else if (betStatus == BetStatus.CANCELED) {

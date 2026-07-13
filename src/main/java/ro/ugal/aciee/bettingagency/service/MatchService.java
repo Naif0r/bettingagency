@@ -112,7 +112,11 @@ public class MatchService {
     }
 
     public boolean updateScoreTeam(int matchId, MatchTeam matchTeam) throws SQLException {
-        getById(matchId);
+        Match match = getById(matchId);
+        if(match.getMatchStatus() != MatchStatus.LIVE){
+            throw new IllegalArgumentException("Cannot be used for this match");
+        }
+
         if (matchTeam == null) {
             throw new IllegalArgumentException("Incorrect match team");
         }

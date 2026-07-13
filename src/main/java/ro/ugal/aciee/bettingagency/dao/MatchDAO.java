@@ -29,7 +29,7 @@ public class MatchDAO {
 
     public List<Match> getAll() throws SQLException {
         List<Match> matchList = new ArrayList<>();
-        String sql = "SELECT * FROM MATCH";
+        String sql = "SELECT * FROM MATCH ORDER BY created_at DESC";
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
@@ -57,7 +57,7 @@ public class MatchDAO {
 
     public List<Match> getBySport(String sportName) throws SQLException {
         List<Match> matchList = new ArrayList<>();
-        String sql = "SELECT * FROM MATCH m JOIN SPORT s ON m.sport_id = s.sport_id WHERE s.sport_name = ? ORDER BY match_date ASC";
+        String sql = "SELECT * FROM MATCH m JOIN SPORT s ON m.sport_id = s.sport_id WHERE s.sport_name = ? ORDER BY match_date DESC";
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, sportName);

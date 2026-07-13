@@ -1,5 +1,7 @@
 package ro.ugal.aciee.bettingagency.ui.panels;
 
+import ro.ugal.aciee.bettingagency.model.Account;
+import ro.ugal.aciee.bettingagency.model.enums.Role;
 import ro.ugal.aciee.bettingagency.ui.Session;
 import ro.ugal.aciee.bettingagency.ui.dialogs.*;
 
@@ -55,7 +57,7 @@ public class TopPanel extends JPanel {
             refreshState();
         });
 
-        Session.setOnChange(() -> {
+        Session.addListener(() -> {
             refreshState();
             updateMenuBar();
         });
@@ -82,6 +84,9 @@ public class TopPanel extends JPanel {
                 dialog.dispose();
             });
 
+            JMenuItem refresh = new JMenuItem("Refresh");
+            refresh.addActionListener(e -> refreshState());
+
             JMenuItem logout = new JMenuItem("Logout");
             logout.addActionListener(e -> {
                 Session.logout();
@@ -90,8 +95,24 @@ public class TopPanel extends JPanel {
                 updateMenuBar();
             });
 
+            if (Session.getCurrentUser().getRole() == Role.ADMIN) {
+                JMenu loadAndSave = new JMenu("Load & Save");
+
+                JMenuItem save = new JMenuItem("Save");
+                save.addActionListener(e -> saveDate());
+
+                JMenuItem load = new JMenuItem("Load");
+                load.addActionListener(e -> loadDate());
+
+                loadAndSave.add(save);
+                loadAndSave.add(load);
+
+                menuBar.add(loadAndSave);
+            }
+
             settings.add(changeUsername);
             settings.add(changePassword);
+            settings.add(refresh);
             settings.addSeparator();
             settings.add(logout);
 
@@ -108,17 +129,29 @@ public class TopPanel extends JPanel {
     private void refreshState() {
         removeAll();
         if (Session.isLoggedIn()) {
-            userLabel.setText(Session.getCurrentUser().getUsername());
-            userBalanceLabel.setText(String.valueOf(Session.getCurrentUser().getBalance()));
+            Account user = Session.getCurrentUser();
+            userLabel.setText(user.getUsername());
             add(userLabel);
-            add(userBalanceLabel);
-            add(depositButton);
-            add(statisticButton);
+
+            if (user.getRole() == Role.PLAYER) {
+                userBalanceLabel.setText(String.valueOf(user.getBalance()));
+                add(userBalanceLabel);
+                add(depositButton);
+                add(statisticButton);
+            }
         } else {
             add(loginButton);
             add(registerButton);
         }
         revalidate();
         repaint();
+    }
+
+    private void saveDate() {
+
+    }
+
+    private void loadDate() {
+
     }
 }
