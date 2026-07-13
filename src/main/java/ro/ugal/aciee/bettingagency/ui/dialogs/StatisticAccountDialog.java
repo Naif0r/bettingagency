@@ -4,6 +4,7 @@ import ro.ugal.aciee.bettingagency.model.Account;
 import ro.ugal.aciee.bettingagency.model.Bet;
 import ro.ugal.aciee.bettingagency.model.enums.AccountStatus;
 import ro.ugal.aciee.bettingagency.model.enums.BetStatus;
+import ro.ugal.aciee.bettingagency.service.AccountService;
 import ro.ugal.aciee.bettingagency.service.BetService;
 import ro.ugal.aciee.bettingagency.ui.Session;
 
@@ -14,8 +15,10 @@ import java.util.List;
 public class StatisticAccountDialog extends JDialog {
     private final JLabel winBetLabel;
     private final JLabel loseBetLabel;
-    private final Account account;
+    private final JLabel status;
+    private Account account;
     private final BetService betService = new BetService();
+    private final AccountService accountService = new AccountService();
 
     public StatisticAccountDialog(JFrame parent) {
         super(parent, "Account statistic", true);
@@ -30,6 +33,7 @@ public class StatisticAccountDialog extends JDialog {
         account = Session.getCurrentUser();
         winBetLabel = new JLabel();
         loseBetLabel = new JLabel();
+        status = new JLabel();
         betStatus();
 
         JPanel top = new JPanel(new BorderLayout());
@@ -48,15 +52,7 @@ public class StatisticAccountDialog extends JDialog {
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
         bottom.add(new JLabel("Account status: "));
 
-        AccountStatus accountStatus = account.getAccountStatus();
-
-        JLabel status = new JLabel(String.valueOf(accountStatus));
-
-        if (accountStatus == AccountStatus.ACTIVE) {
-            status.setForeground(Color.GREEN);
-        } else {
-            status.setForeground(Color.RED);
-        }
+        refreshStatus();
 
         bottom.add(status);
 
@@ -80,6 +76,27 @@ public class StatisticAccountDialog extends JDialog {
             loseBetLabel.setForeground(Color.RED);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
+        }
+    }
+
+    private void refreshStatus() {
+        try {
+            Account updated = accountService.getById(account.getUserId());
+
+            account = updated;
+
+            Session.login(updated);
+
+            status.setText(updated.getAccountStatus().toString());
+
+            if (updated.getAccountStatus() == AccountStatus.ACTIVE) {
+                status.setForeground(Color.GREEN);
+            } else {
+                status.setForeground(Color.RED);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
