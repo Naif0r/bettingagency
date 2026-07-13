@@ -44,7 +44,7 @@ public class BettingAgencyGUI extends JFrame {
     }
 
     public void showBetsPanel() {
-        betUserPanel.updateBetsDisplay();
+        betUserPanel.loadUserBets();
         cardLayout.show(centerContainer, "BETS");
     }
 

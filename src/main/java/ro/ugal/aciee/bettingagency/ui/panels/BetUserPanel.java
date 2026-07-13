@@ -6,10 +6,7 @@ import ro.ugal.aciee.bettingagency.model.Rate;
 import ro.ugal.aciee.bettingagency.model.Team;
 import ro.ugal.aciee.bettingagency.model.enums.BetStatus;
 import ro.ugal.aciee.bettingagency.model.enums.MatchStatus;
-import ro.ugal.aciee.bettingagency.service.BetService;
-import ro.ugal.aciee.bettingagency.service.MatchService;
-import ro.ugal.aciee.bettingagency.service.RateService;
-import ro.ugal.aciee.bettingagency.service.TeamService;
+import ro.ugal.aciee.bettingagency.service.*;
 import ro.ugal.aciee.bettingagency.ui.Session;
 
 import javax.swing.*;
@@ -21,6 +18,7 @@ import java.util.List;
 
 public class BetUserPanel extends JPanel {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("d.M.yyyy, HH:mm");
+    private final AccountService accountService = new AccountService();
     private final BetService betService = new BetService();
     private final MatchService matchService = new MatchService();
     private final RateService rateService = new RateService();
@@ -32,7 +30,7 @@ public class BetUserPanel extends JPanel {
         setLayout(new BorderLayout());
 
         centerBetsPanel = new JPanel();
-        centerBetsPanel.setLayout(new GridLayout(0, 6, 15, 15));
+        centerBetsPanel.setLayout(new GridLayout(0, 3, 15, 15));
 
         JScrollPane scrollPane = new JScrollPane(centerBetsPanel);
         add(createBetsTagsPanel(), BorderLayout.NORTH);
@@ -68,12 +66,12 @@ public class BetUserPanel extends JPanel {
             centerBetsPanel.removeAll();
             centerBetsPanel.setLayout(new BoxLayout(centerBetsPanel, BoxLayout.Y_AXIS));
 
-            int perRow = 6;
+            int perRow = 3;
             JPanel currentRow = null;
 
             for (int i = 0; i < betsByStatus.size(); i++) {
                 if (i % perRow == 0) {
-                    currentRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
+                    currentRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
                     centerBetsPanel.add(currentRow);
                 }
                 currentRow.add(createBetPanel(betsByStatus.get(i)));
@@ -98,9 +96,11 @@ public class BetUserPanel extends JPanel {
             matchesInfo.setLayout(new BoxLayout(matchesInfo, BoxLayout.Y_AXIS));
 
             List<Rate> rateList = betService.getRateByBetId(bet.getBetId());
+            List<Match> matchList = new ArrayList<>();
 
             for (Rate rate : rateList) {
                 Match match = matchService.getById(rate.getMatchId());
+                matchList.add(match);
                 Team team1 = teamService.getById(match.getTeam1Id());
                 Team team2 = teamService.getById(match.getTeam2Id());
 
@@ -115,6 +115,9 @@ public class BetUserPanel extends JPanel {
                         "Winner: " + rate.getType() + "</html>");
                 matchesInfo.add(mInfo);
             }
+
+            JPanel southPanel = new JPanel(new BorderLayout());
+
             JLabel betInfo = new JLabel("<html>" +
                     "Betting time: " + bet.getCreatedAt().format(DATE_TIME_FORMATTER) + "<br>" +
                     "Amount: " + bet.getAmount() + "<br>" +
@@ -122,12 +125,48 @@ public class BetUserPanel extends JPanel {
                     "Status: " + bet.getBetStatus() +
                     "</html>");
 
+            for (Match match : matchList) {
+                if(match.getMatchStatus() == MatchStatus.UPCOMING || match.getMatchStatus() == MatchStatus.LIVE) {
+                    if (bet.getBetStatus() == BetStatus.PENDING){
+                        JButton cashOutButton = new JButton("Cash out");
+                        cashOutButton.addActionListener(e -> cashOut(bet));
+                        southPanel.add(cashOutButton, BorderLayout.EAST);
+                    }
+                }
+            }
+
+            southPanel.add(betInfo, BorderLayout.WEST);
+
             betPanel.add(matchesInfo, BorderLayout.CENTER);
-            betPanel.add(betInfo, BorderLayout.SOUTH);
+            betPanel.add(southPanel, BorderLayout.SOUTH);
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
         }
         return betPanel;
+    }
+
+    public void loadUserBets() {
+        if (!Session.isLoggedIn()) {
+            return;
+        }
+
+        try {
+            betsByStatus = betService.getByUserId(Session.getCurrentUser().getUserId());
+            updateBetsDisplay();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
+    }
+
+    private void cashOut(Bet bet){
+        try{
+            betService.settleBetCashOut(bet.getBetId());
+            Session.login(accountService.getById(Session.getCurrentUser().getUserId()));
+            loadUserBets();
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Cash out error", JOptionPane.ERROR_MESSAGE);
+        }
+
     }
 }

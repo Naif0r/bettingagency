@@ -91,9 +91,9 @@ public class BetService {
             throw new IllegalArgumentException("Incorrect bet status");
         }
         List<Bet> betList = betDAO.getByStatus(betStatus, userId);
-        if (betList.isEmpty()) {
-            throw new IllegalArgumentException("Bet list is empty");
-        }
+//        if (betList.isEmpty()) {
+//            throw new IllegalArgumentException("Bet list is empty");
+//        }
         return betList;
     }
 

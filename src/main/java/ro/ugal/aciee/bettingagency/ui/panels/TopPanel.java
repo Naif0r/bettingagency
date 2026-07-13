@@ -11,6 +11,7 @@ public class TopPanel extends JPanel {
     private final JButton loginButton;
     private final JButton registerButton;
     private final JButton depositButton;
+    private final JButton statisticButton;
     private final JLabel userLabel;
     private final JLabel userBalanceLabel;
 
@@ -22,12 +23,12 @@ public class TopPanel extends JPanel {
         loginButton = new JButton("Login");
         registerButton = new JButton("Register");
         depositButton = new JButton("Deposit");
+        statisticButton = new JButton("Statistic");
         userLabel = new JLabel();
         userBalanceLabel = new JLabel();
 
         add(loginButton);
         add(registerButton);
-        add(depositButton);
 
         loginButton.addActionListener(e -> {
             LoginDialog dialog = new LoginDialog(parentFrame);
@@ -44,6 +45,12 @@ public class TopPanel extends JPanel {
 
         depositButton.addActionListener(e -> {
             DepositDialog dialog = new DepositDialog(parentFrame);
+            dialog.setVisible(true);
+            refreshState();
+        });
+
+        statisticButton.addActionListener(e -> {
+            StatisticAccountDialog dialog = new StatisticAccountDialog(parentFrame);
             dialog.setVisible(true);
             refreshState();
         });
@@ -106,6 +113,7 @@ public class TopPanel extends JPanel {
             add(userLabel);
             add(userBalanceLabel);
             add(depositButton);
+            add(statisticButton);
         } else {
             add(loginButton);
             add(registerButton);

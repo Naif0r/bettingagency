@@ -13,7 +13,7 @@ public class DepositDialog extends JDialog {
     public DepositDialog(JFrame parent) {
         super(parent, "Deposit", true);
 
-        setSize(240, 300);
+        setSize(240, 150);
         setLocationRelativeTo(parent);
 
         JPanel depositPanel = new JPanel(new GridBagLayout());

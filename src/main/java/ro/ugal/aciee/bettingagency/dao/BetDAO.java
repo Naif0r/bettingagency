@@ -58,7 +58,7 @@ public class BetDAO {
 
     public List<Bet> getByUserId(int userId) throws SQLException {
         List<Bet> betList = new ArrayList<>();
-        String sql = "SELECT * FROM BET WHERE user_id = ?";
+        String sql = "SELECT * FROM BET WHERE user_id = ? ORDER BY created_at DESC";
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, userId);

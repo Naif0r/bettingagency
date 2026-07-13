@@ -85,6 +85,10 @@ public class MatchService {
         return matchList;
     }
 
+    public List<Match> getByExistsStatus() throws SQLException {
+        return matchDAO.getByExistsStatus();
+    }
+
     public boolean updateStatus(MatchStatus matchStatus, int matchId) throws SQLException {
         Match match = getById(matchId);
         if (matchStatus == null) {

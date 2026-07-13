@@ -3,6 +3,7 @@ package ro.ugal.aciee.bettingagency.ui.panels;
 import ro.ugal.aciee.bettingagency.model.Match;
 import ro.ugal.aciee.bettingagency.model.Rate;
 import ro.ugal.aciee.bettingagency.model.Team;
+import ro.ugal.aciee.bettingagency.service.MatchService;
 import ro.ugal.aciee.bettingagency.service.RateService;
 import ro.ugal.aciee.bettingagency.service.TeamService;
 import ro.ugal.aciee.bettingagency.ui.BetSlip;
@@ -15,6 +16,7 @@ import java.util.List;
 
 public class HomePanel extends JPanel {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("d.M.yyyy, HH:mm");
+    private final MatchService matchService = new MatchService();
     private final RatePanel ratePanel = new RatePanel();
     private final JPanel centerMatchesPanel;
     private final TeamService teamService = new TeamService();
@@ -28,6 +30,8 @@ public class HomePanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(centerMatchesPanel);
         add(scrollPane, BorderLayout.CENTER);
+
+        defaulMatches();
     }
 
     public void updateMatchesDisplay(List<Match> matches) {
@@ -40,7 +44,7 @@ public class HomePanel extends JPanel {
 
             for (int i = 0; i < matches.size(); i++) {
                 if (i % perRow == 0) {
-                    currentRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
+                    currentRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
                     centerMatchesPanel.add(currentRow);
                 }
                 currentRow.add(createMatchPanel(matches.get(i)));
@@ -109,5 +113,13 @@ public class HomePanel extends JPanel {
         matchPanel.add(bottom, BorderLayout.SOUTH);
 
         return matchPanel;
+    }
+
+    private void defaulMatches(){
+        try {
+            updateMatchesDisplay(matchService.getByExistsStatus());
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
     }
 }
