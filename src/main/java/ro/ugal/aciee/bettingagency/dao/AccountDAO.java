@@ -12,7 +12,7 @@ import java.util.List;
 public class AccountDAO {
     public List<Account> getAll() throws SQLException {
         List<Account> accountList = new ArrayList<>();
-        String sql = "SELECT * FROM ACCOUNT";
+        String sql = "SELECT * FROM ACCOUNT ORDER BY username ASC";
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
@@ -105,6 +105,24 @@ public class AccountDAO {
             if (keys.next()) {
                 account.setUserId(keys.getInt("user_id"));
             }
+            return account;
+        }
+    }
+
+    public Account importer(Account account) throws SQLException {
+        String sql = """
+                INSERT INTO ACCOUNT (user_id, username, password, role, account_status, balance)
+                VALUES (?, ?, ?, ?, ?, ?);
+                """;
+        try(Connection con = ConnectionManager.open();
+            PreparedStatement stmt = con.prepareStatement(sql)){
+            stmt.setInt(1, account.getUserId());
+            stmt.setString(2, account.getUsername());
+            stmt.setString(3, account.getPassword());
+            stmt.setString(4, account.getRole().name());
+            stmt.setString(5, account.getAccountStatus().name());
+            stmt.setDouble(6, account.getBalance());
+            stmt.executeUpdate();
             return account;
         }
     }

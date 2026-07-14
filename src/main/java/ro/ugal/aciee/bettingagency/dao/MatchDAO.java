@@ -10,7 +10,7 @@ import java.util.List;
 
 public class MatchDAO {
     public Match save(Match match) throws SQLException {
-        String sql = "INSERT INTO MATCH (sport_id, team1_id, team2_id, match_date, team1_score, team2_score)" +
+        String sql = "INSERT INTO MATCH (sport_id, team1_id, team2_id, match_date)" +
                 "VALUES (?, ?, ?, ?)";
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -23,6 +23,26 @@ public class MatchDAO {
             if (keys.next()) {
                 match.setMatchId(keys.getInt("match_id"));
             }
+            return match;
+        }
+    }
+
+    public Match importer(Match match) throws SQLException {
+        String sql = """
+                INSERT INTO MATCH (match_id, sport_id, team1_id, team2_id, match_date, match_status, team1_score, team2_score)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+                """;
+        try(Connection con = ConnectionManager.open();
+            PreparedStatement stmt = con.prepareStatement(sql)){
+            stmt.setInt(1, match.getMatchId());
+            stmt.setInt(2, match.getSportId());
+            stmt.setInt(3, match.getTeam1Id());
+            stmt.setInt(4, match.getTeam2Id());
+            stmt.setTimestamp(5, Timestamp.valueOf(match.getMatchDate()));
+            stmt.setString(6, match.getMatchStatus().name());
+            stmt.setInt(7, match.getTeam1Score());
+            stmt.setInt(8, match.getTeam2Score());
+            stmt.executeUpdate();
             return match;
         }
     }

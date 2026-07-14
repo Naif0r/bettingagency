@@ -23,6 +23,20 @@ public class SportDAO {
         }
     }
 
+    public Sport importer(Sport sport) throws SQLException {
+        String sql = """
+                INSERT INTO SPORT (sport_id, sport_name)
+                VALUES (?, ?);
+                """;
+        try(Connection con = ConnectionManager.open();
+            PreparedStatement stmt = con.prepareStatement(sql)){
+            stmt.setInt(1, sport.getSportId());
+            stmt.setString(2, sport.getSportName());
+            stmt.executeUpdate();
+            return sport;
+        }
+    }
+
     public List<Sport> getAll() throws SQLException {
         List<Sport> sportList = new ArrayList<>();
         String sql = "SELECT * FROM SPORT";

@@ -7,6 +7,9 @@ import ro.ugal.aciee.bettingagency.service.MatchService;
 import ro.ugal.aciee.bettingagency.service.SportService;
 import ro.ugal.aciee.bettingagency.ui.BettingAgencyGUI;
 import ro.ugal.aciee.bettingagency.ui.Session;
+import ro.ugal.aciee.bettingagency.ui.dialogs.admin.CreateMatchDialog;
+import ro.ugal.aciee.bettingagency.ui.dialogs.admin.FilterMatchDialog;
+import ro.ugal.aciee.bettingagency.ui.panels.admin.ChangeAccountStatusPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +17,7 @@ import java.util.List;
 
 public class NavPanel extends JPanel {
     private final BettingAgencyGUI gui;
+    private final ChangeAccountStatusPanel changeAccountStatusPanel = new ChangeAccountStatusPanel();
     private final SportService sportService = new SportService();
     private final MatchService matchService = new MatchService();
 
@@ -72,10 +76,16 @@ public class NavPanel extends JPanel {
 
     private void buildAdminButtons() {
         JButton createMatchButton = new JButton("Create Match");
+        createMatchButton.addActionListener(e -> {
+            CreateMatchDialog dialog = new CreateMatchDialog();
+            dialog.setModal(true);
+            dialog.setVisible(true);
+        });
         add(createMatchButton);
 
-        JButton manageMatchesButton = new JButton("Manage Matches");
-        add(manageMatchesButton);
+        JButton manageUsersStatusButton = new JButton("Manage Account Status");
+        manageUsersStatusButton.addActionListener(e -> changeAccountStatusPanel.launch());
+        add(manageUsersStatusButton);
 
         try {
             List<Sport> sports = sportService.getAll();
@@ -91,7 +101,14 @@ public class NavPanel extends JPanel {
                 });
                 add(button);
             }
-        } catch (Exception e){
+            JButton filterMatchByStatus = new JButton("Filter match");
+            filterMatchByStatus.addActionListener(e -> {
+                FilterMatchDialog dialog = new FilterMatchDialog(gui);
+                dialog.setModal(true);
+                dialog.setVisible(true);
+            });
+            add(filterMatchByStatus);
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

@@ -1,4 +1,4 @@
-package ro.ugal.aciee.bettingagency.ui.panels;
+package ro.ugal.aciee.bettingagency.ui.panels.player;
 
 import ro.ugal.aciee.bettingagency.model.Bet;
 import ro.ugal.aciee.bettingagency.model.Match;
@@ -64,6 +64,15 @@ public class BetUserPanel extends JPanel {
     public void updateBetsDisplay() {
         try {
             centerBetsPanel.removeAll();
+
+            if (betsByStatus.isEmpty()) {
+                centerBetsPanel.setLayout(new BorderLayout());
+                centerBetsPanel.add(new JLabel("No bets found", SwingConstants.CENTER), BorderLayout.CENTER);
+                centerBetsPanel.revalidate();
+                centerBetsPanel.repaint();
+                return;
+            }
+
             centerBetsPanel.setLayout(new BoxLayout(centerBetsPanel, BoxLayout.Y_AXIS));
 
             int perRow = 3;
@@ -88,7 +97,8 @@ public class BetUserPanel extends JPanel {
     private JPanel createBetPanel(Bet bet) {
         JPanel betPanel = new JPanel(new BorderLayout());
         betPanel.setBorder(BorderFactory.createLineBorder(Color.GREEN));
-        betPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
+        betPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300));
+        betPanel.setPreferredSize(new Dimension(350, 200));
 
         try {
 

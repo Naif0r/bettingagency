@@ -2,6 +2,9 @@ package ro.ugal.aciee.bettingagency.ui;
 
 import ro.ugal.aciee.bettingagency.model.enums.Role;
 import ro.ugal.aciee.bettingagency.ui.panels.*;
+import ro.ugal.aciee.bettingagency.ui.panels.admin.HomeAdminPanel;
+import ro.ugal.aciee.bettingagency.ui.panels.player.BetUserPanel;
+import ro.ugal.aciee.bettingagency.ui.panels.player.HomePanel;
 
 import javax.swing.*;
 import java.awt.*;

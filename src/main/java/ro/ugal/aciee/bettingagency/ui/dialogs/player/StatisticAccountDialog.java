@@ -1,4 +1,4 @@
-package ro.ugal.aciee.bettingagency.ui.dialogs;
+package ro.ugal.aciee.bettingagency.ui.dialogs.player;
 
 import ro.ugal.aciee.bettingagency.model.Account;
 import ro.ugal.aciee.bettingagency.model.Bet;

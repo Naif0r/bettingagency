@@ -27,6 +27,25 @@ public class BetDAO {
         }
     }
 
+    public Bet importer(Bet bet) throws SQLException {
+        String sql = """
+                INSERT INTO BET (bet_id, user_id, amount, bet_status, created_at, total_odds, possible_win)
+                VALUES (?, ?, ?, ?, ?, ?, ?);
+                """;
+        try(Connection con = ConnectionManager.open();
+            PreparedStatement stmt = con.prepareStatement(sql)){
+            stmt.setInt(1, bet.getBetId());
+            stmt.setInt(2, bet.getUserId());
+            stmt.setDouble(3, bet.getAmount());
+            stmt.setString(4, bet.getBetStatus().name());
+            stmt.setTimestamp(5, Timestamp.valueOf(bet.getCreatedAt()));
+            stmt.setDouble(6, bet.getTotalOdds());
+            stmt.setDouble(7, bet.getPossibleWin());
+            stmt.executeUpdate();
+            return bet;
+        }
+    }
+
     public List<Bet> getAll() throws SQLException {
         List<Bet> betList = new ArrayList<>();
         String sql = "SELECT * FROM BET";

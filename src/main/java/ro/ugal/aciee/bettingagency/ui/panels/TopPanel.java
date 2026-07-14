@@ -4,9 +4,14 @@ import ro.ugal.aciee.bettingagency.model.Account;
 import ro.ugal.aciee.bettingagency.model.enums.Role;
 import ro.ugal.aciee.bettingagency.ui.Session;
 import ro.ugal.aciee.bettingagency.ui.dialogs.*;
+import ro.ugal.aciee.bettingagency.ui.dialogs.player.DepositDialog;
+import ro.ugal.aciee.bettingagency.ui.dialogs.player.StatisticAccountDialog;
+import ro.ugal.aciee.bettingagency.utils.database.ImportAndExportManager;
+import ro.ugal.aciee.bettingagency.utils.database.DatabaseManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
 public class TopPanel extends JPanel {
     private final JFrame parentFrame;
@@ -85,7 +90,9 @@ public class TopPanel extends JPanel {
             });
 
             JMenuItem refresh = new JMenuItem("Refresh");
-            refresh.addActionListener(e -> refreshState());
+            refresh.addActionListener(e -> {
+                refreshState();
+            });
 
             JMenuItem logout = new JMenuItem("Logout");
             logout.addActionListener(e -> {
@@ -102,7 +109,7 @@ public class TopPanel extends JPanel {
                 save.addActionListener(e -> saveDate());
 
                 JMenuItem load = new JMenuItem("Load");
-                load.addActionListener(e -> loadDate());
+                load.addActionListener(e -> loadData());
 
                 loadAndSave.add(save);
                 loadAndSave.add(load);
@@ -151,7 +158,26 @@ public class TopPanel extends JPanel {
 
     }
 
-    private void loadDate() {
+    private void loadData() {
+        try {
+            JFileChooser chooser = new JFileChooser();
 
+            if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                File file = chooser.getSelectedFile();
+
+                DatabaseManager.drop();
+                DatabaseManager.initialize();
+                ImportAndExportManager.importExcelFile(file);
+
+                JOptionPane.showMessageDialog(this, "Date loaded successfully");
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Import error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
 }

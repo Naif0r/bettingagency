@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class DatabaseInitializer {
+public class DatabaseManager {
     private static final String SQL_CREATE_ACCOUNT = """
             CREATE TABLE IF NOT EXISTS ACCOUNT (
                                      user_id SERIAL PRIMARY KEY,
@@ -70,6 +70,16 @@ public class DatabaseInitializer {
             );
             """;
 
+    private static final String SQL_DROP = """
+                    DROP TABLE IF EXISTS BET_RATE CASCADE;
+                    DROP TABLE IF EXISTS RATE CASCADE;
+                    DROP TABLE IF EXISTS BET CASCADE;
+                    DROP TABLE IF EXISTS MATCH CASCADE;
+                    DROP TABLE IF EXISTS TEAM CASCADE;
+                    DROP TABLE IF EXISTS SPORT CASCADE;
+                    DROP TABLE IF EXISTS ACCOUNT CASCADE;
+            """;
+
     public static void initialize() throws SQLException {
         try (Connection con = ConnectionManager.open();
              Statement stmt = con.createStatement()) {
@@ -80,6 +90,13 @@ public class DatabaseInitializer {
             stmt.execute(SQL_CREATE_RATE);
             stmt.execute(SQL_CREATE_BET);
             stmt.execute(SQL_CREATE_BET_RATE);
+        }
+    }
+
+    public static void drop() throws Exception {
+        try (Connection con = ConnectionManager.open();
+             Statement stmt = con.createStatement()) {
+            stmt.execute(SQL_DROP);
         }
     }
 }

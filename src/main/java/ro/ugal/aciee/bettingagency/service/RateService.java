@@ -14,61 +14,73 @@ public class RateService {
 
     public Rate save(int matchId, RateType type, double value) throws SQLException {
         matchService.getById(matchId);
+
         if (type == null) {
             throw new IllegalArgumentException("Type is empty");
         }
+
         if (value <= 1.00) {
             throw new IllegalArgumentException("The coefficient must be greater than 1.00");
         }
+
         List<Rate> rates = rateDAO.getByMatch(matchId);
+
         for (Rate rate : rates) {
             if (rate.getType() == type) {
                 throw new IllegalArgumentException("This rate already exists for the match");
             }
         }
+
         Rate rate = new Rate();
         rate.setMatchId(matchId);
         rate.setType(type);
         rate.setValue(value);
+
         return rateDAO.save(rate);
     }
 
-    public List<Rate> getAll() throws SQLException {
-        List<Rate> rateList = rateDAO.getAll();
-        if (rateList.isEmpty()) {
-            throw new IllegalArgumentException("Rate list is empty");
+    public Rate importer(Rate rate) {
+        try {
+            return rateDAO.importer(rate);
+        } catch (SQLException e){
+            throw new IllegalArgumentException(e.getMessage());
         }
-        return rateList;
+    }
+
+    public List<Rate> getAll() throws SQLException {
+        return rateDAO.getAll();
     }
 
     public List<Rate> getByMatchId(int matchId) throws SQLException {
         matchService.getById(matchId);
-        List<Rate> rateList = rateDAO.getByMatch(matchId);
-        if (rateList.isEmpty()) {
-            throw new IllegalArgumentException("Rate list is empty");
-        }
-        return rateList;
+        return rateDAO.getByMatch(matchId);
     }
 
     public Rate getById(int rateId) throws SQLException {
         if (rateId <= 0) {
             throw new IllegalArgumentException("Incorrect rate id");
         }
+
         Rate rate = rateDAO.getById(rateId);
+
         if (rate == null) {
             throw new IllegalArgumentException("Rate not found");
         }
+
         return rate;
     }
 
     public boolean updateStatus(int rateId, RateStatus rateStatus) throws SQLException {
         Rate rate = getById(rateId);
+
         if (rateStatus == null) {
             throw new IllegalArgumentException("Rate status is empty");
         }
+
         if (rate.getRateStatus() == rateStatus) {
             throw new IllegalArgumentException("The status cannot be set because it is already set");
         }
+
         return rateDAO.updateStatus(rateId, rateStatus);
     }
 

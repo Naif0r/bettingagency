@@ -16,15 +16,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BetRateDAO {
-    public BetRate save(BetRate betRate) throws SQLException {
-        String sql = "INSERT INTO BET_RATE (bet_id, rate_id)" +
-                "VALUES (?, ?)";
-        try (Connection con = ConnectionManager.open();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
-            stmt.setInt(1, betRate.getBetId());
-            stmt.setInt(2, betRate.getRateId());
-            stmt.executeUpdate();
-            return betRate;
+    public BetRate save(BetRate betRate) {
+        try {
+            String sql = "INSERT INTO BET_RATE (bet_id, rate_id)" +
+                    "VALUES (?, ?)";
+            try (Connection con = ConnectionManager.open();
+                 PreparedStatement stmt = con.prepareStatement(sql)) {
+                stmt.setInt(1, betRate.getBetId());
+                stmt.setInt(2, betRate.getRateId());
+                stmt.executeUpdate();
+                return betRate;
+            }
+        } catch (SQLException e){
+            throw new IllegalArgumentException(e.getMessage());
         }
     }
 

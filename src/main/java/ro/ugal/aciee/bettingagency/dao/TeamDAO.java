@@ -1,5 +1,6 @@
 package ro.ugal.aciee.bettingagency.dao;
 
+import ro.ugal.aciee.bettingagency.model.Sport;
 import ro.ugal.aciee.bettingagency.model.Team;
 import ro.ugal.aciee.bettingagency.utils.database.ConnectionManager;
 
@@ -20,6 +21,21 @@ public class TeamDAO {
             if (keys.next()) {
                 team.setTeamId(keys.getInt("team_id"));
             }
+            return team;
+        }
+    }
+
+    public Team importer(Team team) throws SQLException {
+        String sql = """
+                INSERT INTO TEAM (team_id, sport_id, team_name)
+                VALUES (?, ?, ?);
+                """;
+        try(Connection con = ConnectionManager.open();
+            PreparedStatement stmt = con.prepareStatement(sql)){
+            stmt.setInt(1, team.getTeamId());
+            stmt.setInt(2, team.getSportId());
+            stmt.setString(3, team.getTeamName());
+            stmt.executeUpdate();
             return team;
         }
     }
@@ -58,6 +74,26 @@ public class TeamDAO {
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, teamId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapTeam(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public Team getByTeamNameAndSport(String teamName, String sportName) throws SQLException {
+        String sql = """
+                SELECT t.* FROM TEAM t 
+                JOIN SPORT s ON t.sport_id = s.sport_id
+                WHERE t.team_name = ?
+                AND s.sport_name = ?;
+                """;
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, teamName);
+            stmt.setString(2, sportName);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return mapTeam(rs);

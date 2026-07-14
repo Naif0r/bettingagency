@@ -11,48 +11,63 @@ public class SportService {
 
     public Sport save(String sportName) throws SQLException {
         sportName = sportName.trim();
+
         if (sportName.isBlank()) {
             throw new IllegalArgumentException("Sport name is empty");
         }
+
         if (sportDAO.getBySportName(sportName) != null) {
             throw new IllegalArgumentException("This sport already exist");
         }
+
         Sport sport = new Sport();
         sport.setSportName(sportName);
+
         return sportDAO.save(sport);
     }
 
-    public List<Sport> getAll() throws SQLException {
-        List<Sport> sportList = sportDAO.getAll();
-        if (sportList.isEmpty()) {
-            throw new IllegalArgumentException("Sport list is empty");
+    public Sport importer(Sport sport) {
+        try {
+            return sportDAO.importer(sport);
+        } catch (SQLException e){
+            throw new IllegalArgumentException(e.getMessage());
         }
-        return sportList;
+    }
+
+    public List<Sport> getAll() throws SQLException {
+        return sportDAO.getAll();
     }
 
     public Sport getById(int sportId) throws SQLException {
         if (sportId <= 0) {
             throw new IllegalArgumentException("Incorrect sport id");
         }
+
         Sport sport = sportDAO.getById(sportId);
+
         if (sport == null) {
             throw new IllegalArgumentException("Sport not found");
         }
+
         return sport;
     }
 
     public boolean updateSportName(String newSportName, int sportId) throws SQLException {
         Sport sport = getById(sportId);
         newSportName = newSportName.trim();
+
         if (newSportName.isBlank()) {
             throw new IllegalArgumentException("Sport name is empty");
         }
+
         if (sport.getSportName().equals(newSportName)) {
             throw new IllegalArgumentException("The new sport name must be different from the current one");
         }
+
         if (sportDAO.getBySportName(newSportName) != null) {
             throw new IllegalArgumentException("Сannot use a name that already exists in the database");
         }
+
         return sportDAO.update(newSportName, sportId);
     }
 

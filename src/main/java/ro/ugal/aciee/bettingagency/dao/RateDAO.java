@@ -27,6 +27,23 @@ public class RateDAO {
         }
     }
 
+    public Rate importer(Rate rate) throws SQLException {
+        String sql = """
+                INSERT INTO RATE (rate_id, match_id, type, value, rate_status)
+                VALUES (?, ?, ?, ?, ?);
+                """;
+        try(Connection con = ConnectionManager.open();
+            PreparedStatement stmt = con.prepareStatement(sql)){
+            stmt.setInt(1, rate.getRateId());
+            stmt.setInt(2, rate.getMatchId());
+            stmt.setString(3, rate.getType().name());
+            stmt.setDouble(4, rate.getValue());
+            stmt.setString(5, rate.getRateStatus().name());
+            stmt.executeUpdate();
+            return rate;
+        }
+    }
+
     public List<Rate> getAll() throws SQLException {
         List<Rate> rateList = new ArrayList<>();
         String sql = "SELECT * FROM RATE ";

@@ -1,4 +1,4 @@
-package ro.ugal.aciee.bettingagency.ui.panels;
+package ro.ugal.aciee.bettingagency.ui.panels.player;
 
 import ro.ugal.aciee.bettingagency.model.Bet;
 import ro.ugal.aciee.bettingagency.model.Match;
@@ -29,7 +29,7 @@ public class RatePanel extends JFrame {
 
     public RatePanel() {
         setTitle("Coupon");
-        setSize(340, 400);
+        setSize(380, 400);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
@@ -169,7 +169,7 @@ public class RatePanel extends JFrame {
 
             BetSlip.clear();
             updateRatesDisplay();
-            JOptionPane.showMessageDialog(this, "Bet placed successfully!");
+            JOptionPane.showMessageDialog(this, "Bet placed successfully");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Invalid bet: " + e.getMessage(), "Bet Error", JOptionPane.ERROR_MESSAGE);
         }
