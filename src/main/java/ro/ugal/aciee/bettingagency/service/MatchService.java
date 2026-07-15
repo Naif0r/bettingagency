@@ -1,6 +1,8 @@
 package ro.ugal.aciee.bettingagency.service;
 
 import ro.ugal.aciee.bettingagency.dao.MatchDAO;
+import ro.ugal.aciee.bettingagency.dto.BetLegDTO;
+import ro.ugal.aciee.bettingagency.dto.MatchTeamNamesDTO;
 import ro.ugal.aciee.bettingagency.model.Match;
 import ro.ugal.aciee.bettingagency.model.Team;
 import ro.ugal.aciee.bettingagency.model.enums.MatchStatus;
@@ -54,7 +56,7 @@ public class MatchService {
     public Match importer(Match match) {
         try {
             return matchDAO.importer(match);
-        } catch (SQLException e){
+        } catch (SQLException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
     }
@@ -84,7 +86,7 @@ public class MatchService {
             throw new IllegalArgumentException("Sport name is empty");
         }
 
-        return  matchDAO.getBySport(sportName);
+        return matchDAO.getBySport(sportName);
     }
 
     public List<Match> getByStatus(MatchStatus matchStatus) throws SQLException {
@@ -130,7 +132,7 @@ public class MatchService {
     public boolean updateScoreTeam(int matchId, MatchTeam matchTeam) throws SQLException {
         Match match = getById(matchId);
 
-        if(match.getMatchStatus() != MatchStatus.LIVE){
+        if (match.getMatchStatus() != MatchStatus.LIVE) {
             throw new IllegalArgumentException("Cannot be used for this match");
         }
 
@@ -168,9 +170,36 @@ public class MatchService {
         return RateType.WIN2;
     }
 
+    public RateType getWinnerMatch(Match match) {
+        int team1Score = match.getTeam1Score();
+        int team2Score = match.getTeam2Score();
+
+        if (match.getMatchStatus() != MatchStatus.FINISHED) {
+            throw new IllegalArgumentException("The match must be finished");
+        }
+
+        if (team1Score > team2Score) {
+            return RateType.WIN1;
+        }
+
+        if (team1Score == team2Score) {
+            return RateType.DRAW;
+        }
+
+        return RateType.WIN2;
+    }
+
     public boolean delete(int matchId) throws SQLException {
         getById(matchId);
         return matchDAO.delete(matchId);
+    }
+
+    public List<BetLegDTO> getMatchInfoByBet(int betId) throws SQLException {
+        return matchDAO.getMatchInfoByBet(betId);
+    }
+
+    public MatchTeamNamesDTO getMatchTeams(int matchId) throws SQLException {
+        return matchDAO.getMatchTeams(matchId);
     }
 
 }

@@ -1,11 +1,9 @@
 package ro.ugal.aciee.bettingagency.ui.panels.player;
 
+import ro.ugal.aciee.bettingagency.dto.MatchOddDTO;
 import ro.ugal.aciee.bettingagency.model.Match;
-import ro.ugal.aciee.bettingagency.model.Rate;
-import ro.ugal.aciee.bettingagency.model.Team;
 import ro.ugal.aciee.bettingagency.service.MatchService;
 import ro.ugal.aciee.bettingagency.service.RateService;
-import ro.ugal.aciee.bettingagency.service.TeamService;
 import ro.ugal.aciee.bettingagency.ui.BetSlip;
 
 import javax.swing.*;
@@ -17,11 +15,10 @@ import java.util.List;
 public class HomePanel extends JPanel {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("d.M.yyyy, HH:mm");
     private final MatchService matchService = new MatchService();
+    private final RateService rateService = new RateService();
     private final RatePanel ratePanel = new RatePanel();
     private final JPanel centerMatchesPanel;
     private final JPanel wrapperPanel;
-    private final TeamService teamService = new TeamService();
-    private final RateService rateService = new RateService();
 
     public HomePanel() {
         setLayout(new BorderLayout());
@@ -81,15 +78,17 @@ public class HomePanel extends JPanel {
         top.add(new JLabel(match.getMatchStatus().toString()), BorderLayout.WEST);
         top.add(new JLabel(match.getMatchDate().format(DATE_TIME_FORMATTER)), BorderLayout.EAST);
 
-        Team team1 = teamService.getById(match.getTeam1Id());
-        Team team2 = teamService.getById(match.getTeam2Id());
+        List<MatchOddDTO> matchOddDTOList = rateService.getRatesWithTeamNames(match.getMatchId());
+
+        String team1 = matchOddDTOList.getFirst().team1Name();
+        String team2 = matchOddDTOList.getFirst().team2Name();
 
         JPanel centerPanel = new JPanel(new BorderLayout());
 
         JLabel team = new JLabel("<html>" +
-                team1.getTeamName() +
+                team1 +
                 "<br>" +
-                team2.getTeamName() +
+                team2 +
                 "</html>");
         JLabel score = new JLabel("<html>" +
                 match.getTeam1Score() +
@@ -103,12 +102,12 @@ public class HomePanel extends JPanel {
         centerPanel.add(score, BorderLayout.EAST);
 
         JPanel bottom = new JPanel(new FlowLayout());
-        List<Rate> rates = rateService.getByMatchId(match.getMatchId());
-        for (Rate rate : rates) {
-            JButton button = new JButton(rate.getType() + "  " + rate.getValue());
+
+        for (MatchOddDTO matchOddDTO : matchOddDTOList) {
+            JButton button = new JButton(matchOddDTO.rate().getType() + "  " + matchOddDTO.rate().getValue());
             button.addActionListener(e -> {
                 try {
-                    boolean added = BetSlip.add(rate.getRateId());
+                    boolean added = BetSlip.add(matchOddDTO.rate().getRateId());
                     if (!added) {
                         JOptionPane.showMessageDialog(this, "It is impossible to add this odds to the bet");
                     }

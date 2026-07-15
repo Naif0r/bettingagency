@@ -1,5 +1,6 @@
 package ro.ugal.aciee.bettingagency.dao;
 
+import ro.ugal.aciee.bettingagency.dto.MatchOddDTO;
 import ro.ugal.aciee.bettingagency.model.Rate;
 import ro.ugal.aciee.bettingagency.model.enums.RateStatus;
 import ro.ugal.aciee.bettingagency.model.enums.RateType;
@@ -32,8 +33,8 @@ public class RateDAO {
                 INSERT INTO RATE (rate_id, match_id, type, value, rate_status)
                 VALUES (?, ?, ?, ?, ?);
                 """;
-        try(Connection con = ConnectionManager.open();
-            PreparedStatement stmt = con.prepareStatement(sql)){
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, rate.getRateId());
             stmt.setInt(2, rate.getMatchId());
             stmt.setString(3, rate.getType().name());
@@ -85,6 +86,29 @@ public class RateDAO {
             }
         }
         return null;
+    }
+
+    public List<MatchOddDTO> getRatesWithTeamNames(int matchId) throws SQLException {
+        List<MatchOddDTO> matchOddDTOList = new ArrayList<>();
+        String sql = """
+                SELECT r.*, t1.team_name AS team1_name, t2.team_name AS team2_name FROM RATE r 
+                JOIN MATCH m ON r.match_id = m.match_id
+                JOIN TEAM t1 ON m.team1_id = t1.team_id
+                JOIN TEAM t2 ON m.team2_id = t2.team_id
+                WHERE m.match_id = ?;
+                """;
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, matchId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    matchOddDTOList.add(new MatchOddDTO(rs.getString("team1_name"),
+                            rs.getString("team2_name"),
+                            mapRate(rs)));
+                }
+            }
+        }
+        return matchOddDTOList;
     }
 
     public boolean updateStatus(int rateId, RateStatus rateStatus) throws SQLException {

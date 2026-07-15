@@ -1,10 +1,9 @@
 package ro.ugal.aciee.bettingagency.ui.panels.admin;
 
+import ro.ugal.aciee.bettingagency.dto.MatchTeamNamesDTO;
 import ro.ugal.aciee.bettingagency.model.Match;
-import ro.ugal.aciee.bettingagency.model.Team;
 import ro.ugal.aciee.bettingagency.model.enums.MatchTeam;
 import ro.ugal.aciee.bettingagency.service.MatchService;
-import ro.ugal.aciee.bettingagency.service.TeamService;
 import ro.ugal.aciee.bettingagency.ui.dialogs.admin.ChangeStatusMatchDialog;
 
 import javax.swing.*;
@@ -17,7 +16,6 @@ public class HomeAdminPanel extends JPanel {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("d.M.yyyy, HH:mm");
     private final JPanel centerMatchesPanel;
     private final JPanel wrapperPanel;
-    private final TeamService teamService = new TeamService();
     private final MatchService matchService = new MatchService();
 
     public HomeAdminPanel() {
@@ -78,15 +76,17 @@ public class HomeAdminPanel extends JPanel {
         top.add(new JLabel(match.getMatchStatus().toString()), BorderLayout.WEST);
         top.add(new JLabel(match.getMatchDate().format(DATE_TIME_FORMATTER)), BorderLayout.EAST);
 
-        Team team1 = teamService.getById(match.getTeam1Id());
-        Team team2 = teamService.getById(match.getTeam2Id());
+        MatchTeamNamesDTO matchTeamNamesDTO = matchService.getMatchTeams(match.getMatchId());
+
+        String team1 = matchTeamNamesDTO.team1Name();
+        String team2 = matchTeamNamesDTO.team2Name();
 
         JPanel centerPanel = new JPanel(new BorderLayout());
 
         JLabel team = new JLabel("<html>" +
-                team1.getTeamName() +
+                team1 +
                 "<br>" +
-                team2.getTeamName() +
+                team2 +
                 "</html>");
         JLabel score = new JLabel("<html>" +
                 match.getTeam1Score() +

@@ -1,12 +1,13 @@
 package ro.ugal.aciee.bettingagency.ui.panels.player;
 
+import ro.ugal.aciee.bettingagency.dto.BetLegDTO;
 import ro.ugal.aciee.bettingagency.model.Bet;
 import ro.ugal.aciee.bettingagency.model.Match;
-import ro.ugal.aciee.bettingagency.model.Rate;
-import ro.ugal.aciee.bettingagency.model.Team;
 import ro.ugal.aciee.bettingagency.model.enums.BetStatus;
 import ro.ugal.aciee.bettingagency.model.enums.MatchStatus;
-import ro.ugal.aciee.bettingagency.service.*;
+import ro.ugal.aciee.bettingagency.service.AccountService;
+import ro.ugal.aciee.bettingagency.service.BetService;
+import ro.ugal.aciee.bettingagency.service.MatchService;
 import ro.ugal.aciee.bettingagency.ui.Session;
 
 import javax.swing.*;
@@ -21,7 +22,6 @@ public class BetUserPanel extends JPanel {
     private final AccountService accountService = new AccountService();
     private final BetService betService = new BetService();
     private final MatchService matchService = new MatchService();
-    private final TeamService teamService = new TeamService();
     private final JPanel centerBetsPanel;
     private final JPanel wrapperPanel;
     private List<Bet> betsByStatus = new ArrayList<>();
@@ -82,7 +82,7 @@ public class BetUserPanel extends JPanel {
                 emptyPanel.add(emptyLabel);
 
                 wrapperPanel.add(emptyPanel, BorderLayout.CENTER);
-            }else {
+            } else {
                 wrapperPanel.add(centerBetsPanel, BorderLayout.NORTH);
                 centerBetsPanel.setLayout(new GridLayout(0, 3, 15, 15));
 
@@ -115,24 +115,24 @@ public class BetUserPanel extends JPanel {
             JPanel matchesInfo = new JPanel();
             matchesInfo.setLayout(new BoxLayout(matchesInfo, BoxLayout.Y_AXIS));
 
-            List<Rate> rateList = betService.getRateByBetId(bet.getBetId());
+            List<BetLegDTO> betLegDTOList = matchService.getMatchInfoByBet(bet.getBetId());
             List<Match> matchList = new ArrayList<>();
 
-            for (Rate rate : rateList) {
-                Match match = matchService.getById(rate.getMatchId());
+            for (BetLegDTO betLegDTO : betLegDTOList) {
+                Match match = betLegDTO.match();
                 matchList.add(match);
-                Team team1 = teamService.getById(match.getTeam1Id());
-                Team team2 = teamService.getById(match.getTeam2Id());
+                String team1 = betLegDTO.team1Name();
+                String team2 = betLegDTO.team2Name();
 
                 String winnerInfo = match.getMatchStatus() == MatchStatus.FINISHED
-                        ? String.valueOf(matchService.getWinnerMatch(match.getMatchId()))
+                        ? String.valueOf(matchService.getWinnerMatch(match))
                         : match.getMatchStatus().toString();
 
-                JLabel mInfo = new JLabel("<html>" + team1.getTeamName() + " " + match.getTeam1Score() +
+                JLabel mInfo = new JLabel("<html>" + team1 + " " + match.getTeam1Score() +
                         " : " +
-                        match.getTeam2Score() + " " + team2.getTeamName() +
+                        match.getTeam2Score() + " " + team2 +
                         " | " + winnerInfo + "<br>" +
-                        "Winner: " + rate.getType() + "</html>");
+                        "Winner: " + betLegDTO.rateType() + "</html>");
                 matchesInfo.add(mInfo);
             }
 
@@ -146,8 +146,8 @@ public class BetUserPanel extends JPanel {
                     "</html>");
 
             for (Match match : matchList) {
-                if(match.getMatchStatus() == MatchStatus.UPCOMING || match.getMatchStatus() == MatchStatus.LIVE) {
-                    if (bet.getBetStatus() == BetStatus.PENDING){
+                if (match.getMatchStatus() == MatchStatus.UPCOMING || match.getMatchStatus() == MatchStatus.LIVE) {
+                    if (bet.getBetStatus() == BetStatus.PENDING) {
                         JButton cashOutButton = new JButton("Cash out");
                         cashOutButton.addActionListener(e -> cashOut(bet));
                         southPanel.add(cashOutButton, BorderLayout.EAST);
@@ -189,12 +189,12 @@ public class BetUserPanel extends JPanel {
         }
     }
 
-    private void cashOut(Bet bet){
-        try{
+    private void cashOut(Bet bet) {
+        try {
             betService.settleBetCashOut(bet.getBetId());
             Session.login(accountService.getById(Session.getCurrentUser().getUserId()));
             loadUserBets();
-        }catch (Exception e){
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(
                     this,
                     e.getMessage(),

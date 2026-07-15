@@ -1,6 +1,7 @@
 package ro.ugal.aciee.bettingagency.service;
 
 import ro.ugal.aciee.bettingagency.dao.RateDAO;
+import ro.ugal.aciee.bettingagency.dto.MatchOddDTO;
 import ro.ugal.aciee.bettingagency.model.Rate;
 import ro.ugal.aciee.bettingagency.model.enums.RateStatus;
 import ro.ugal.aciee.bettingagency.model.enums.RateType;
@@ -42,7 +43,7 @@ public class RateService {
     public Rate importer(Rate rate) {
         try {
             return rateDAO.importer(rate);
-        } catch (SQLException e){
+        } catch (SQLException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
     }
@@ -87,6 +88,10 @@ public class RateService {
     public boolean delete(int rateId) throws SQLException {
         getById(rateId);
         return rateDAO.delete(rateId);
+    }
+
+    public List<MatchOddDTO> getRatesWithTeamNames(int matchId) throws SQLException {
+        return rateDAO.getRatesWithTeamNames(matchId);
     }
 
 }

@@ -1,7 +1,12 @@
 package ro.ugal.aciee.bettingagency.dao;
 
+import ro.ugal.aciee.bettingagency.dto.BetLegDTO;
+import ro.ugal.aciee.bettingagency.dto.MatchTeamNamesDTO;
 import ro.ugal.aciee.bettingagency.model.Match;
+import ro.ugal.aciee.bettingagency.model.Rate;
 import ro.ugal.aciee.bettingagency.model.enums.MatchStatus;
+import ro.ugal.aciee.bettingagency.model.enums.RateStatus;
+import ro.ugal.aciee.bettingagency.model.enums.RateType;
 import ro.ugal.aciee.bettingagency.utils.database.ConnectionManager;
 
 import java.sql.*;
@@ -32,8 +37,8 @@ public class MatchDAO {
                 INSERT INTO MATCH (match_id, sport_id, team1_id, team2_id, match_date, match_status, team1_score, team2_score)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?);
                 """;
-        try(Connection con = ConnectionManager.open();
-            PreparedStatement stmt = con.prepareStatement(sql)){
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, match.getMatchId());
             stmt.setInt(2, match.getSportId());
             stmt.setInt(3, match.getTeam1Id());
@@ -105,15 +110,15 @@ public class MatchDAO {
         return matchList;
     }
 
-    public List<Match> getByExistsStatus() throws SQLException{
+    public List<Match> getByExistsStatus() throws SQLException {
         List<Match> matchList = new ArrayList<>();
         String sql = "SELECT * FROM MATCH WHERE match_status IN (?, ?) ORDER BY match_date ASC";
-        try(Connection con = ConnectionManager.open();
-            PreparedStatement stmt = con.prepareStatement(sql)){
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, MatchStatus.UPCOMING.name());
             stmt.setString(2, MatchStatus.LIVE.name());
-            try(ResultSet rs = stmt.executeQuery()){
-                while(rs.next()){
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
                     matchList.add(mapMatch(rs));
                 }
             }
@@ -158,6 +163,52 @@ public class MatchDAO {
         }
     }
 
+    public List<BetLegDTO> getMatchInfoByBet(int betId) throws SQLException {
+        List<BetLegDTO> betLegDTOLis = new ArrayList<>();
+        String sql = """
+                SELECT m.* , t1.team_name AS team1_name, t2.team_name AS team2_name, r.type AS rate_type FROM MATCH m
+                JOIN TEAM t1 ON m.team1_id = t1.team_id
+                JOIN TEAM t2 ON m.team2_id = t2.team_id
+                JOIN RATE r ON m.match_id = r.match_id
+                JOIN BET_RATE br ON r.rate_id = br.rate_id
+                WHERE br.bet_id = ?;
+                """;
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, betId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    betLegDTOLis.add(new BetLegDTO(mapMatch(rs),
+                            rs.getString("team1_name"),
+                            rs.getString("team2_name"),
+                            RateType.valueOf(rs.getString("rate_type"))
+                    ));
+                }
+            }
+        }
+        return betLegDTOLis;
+    }
+
+    public MatchTeamNamesDTO getMatchTeams(int matchId) throws SQLException {
+        String sql = """
+                SELECT t1.team_name AS team1_name, t2.team_name AS team2_name FROM MATCH m
+                JOIN TEAM t1 ON m.team1_id = t1.team_id
+                JOIN TEAM t2 ON m.team2_id = t2.team_id
+                WHERE m.match_id = ?;
+                """;
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, matchId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new MatchTeamNamesDTO(rs.getString("team1_name"),
+                            rs.getString("team2_name"));
+                }
+            }
+        }
+        return null;
+    }
+
     private Match mapMatch(ResultSet rs) throws SQLException {
         return new Match(rs.getInt("match_id"),
                 rs.getInt("sport_id"),
@@ -167,5 +218,13 @@ public class MatchDAO {
                 MatchStatus.valueOf(rs.getString("match_status")),
                 rs.getInt("team1_score"),
                 rs.getInt("team2_score"));
+    }
+
+    private Rate mapRate(ResultSet rs) throws SQLException {
+        return new Rate(rs.getInt("rate_id"),
+                rs.getInt("match_id"),
+                RateType.valueOf(rs.getString("type")),
+                rs.getDouble("value"),
+                RateStatus.valueOf(rs.getString("rate_status")));
     }
 }
