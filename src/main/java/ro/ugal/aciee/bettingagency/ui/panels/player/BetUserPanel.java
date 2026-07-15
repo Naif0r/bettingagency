@@ -56,7 +56,12 @@ public class BetUserPanel extends JPanel {
                 betsPanel.add(button);
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
         return betsPanel;
     }
@@ -90,7 +95,12 @@ public class BetUserPanel extends JPanel {
             centerBetsPanel.repaint();
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -151,7 +161,12 @@ public class BetUserPanel extends JPanel {
             betPanel.add(southPanel, BorderLayout.SOUTH);
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
         return betPanel;
     }
@@ -165,7 +180,12 @@ public class BetUserPanel extends JPanel {
             betsByStatus = betService.getByUserId(Session.getCurrentUser().getUserId());
             updateBetsDisplay();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -175,7 +195,12 @@ public class BetUserPanel extends JPanel {
             Session.login(accountService.getById(Session.getCurrentUser().getUserId()));
             loadUserBets();
         }catch (Exception e){
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Cash out error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
 
     }

@@ -62,7 +62,12 @@ public class HomeAdminPanel extends JPanel {
             centerMatchesPanel.repaint();
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -124,7 +129,12 @@ public class HomeAdminPanel extends JPanel {
             matchService.updateScoreTeam(matchId, matchTeam);
             defaultMatches();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Score error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -137,7 +147,12 @@ public class HomeAdminPanel extends JPanel {
         try {
             updateMatchesDisplay(matchService.getByExistsStatus());
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Matches error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 }

@@ -51,10 +51,12 @@ public class DepositDialog extends JDialog {
             Session.login(accountService.getById(Session.getCurrentUser().getUserId()));
             JOptionPane.showMessageDialog(this, "The replenishment was successful");
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                    "Invalid deposit: " + e.getMessage(),
-                    "Deposit Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 }

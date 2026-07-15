@@ -63,7 +63,12 @@ public class HomePanel extends JPanel {
             centerMatchesPanel.repaint();
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -128,7 +133,12 @@ public class HomePanel extends JPanel {
         try {
             updateMatchesDisplay(matchService.getByExistsStatus());
         }catch (Exception e){
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 }

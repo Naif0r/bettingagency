@@ -1,7 +1,6 @@
 package ro.ugal.aciee.bettingagency.utils.database;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DatabaseManager {
@@ -80,7 +79,39 @@ public class DatabaseManager {
                     DROP TABLE IF EXISTS ACCOUNT CASCADE;
             """;
 
-    public static void initialize() throws SQLException {
+    private static final String SQL_DELETE = """
+                      TRUNCATE TABLE
+                                    BET_RATE,
+                                    RATE,
+                                    BET,
+                                    MATCH,
+                                    TEAM,
+                                    SPORT,
+                                    ACCOUNT
+                                    RESTART IDENTITY CASCADE;
+            """;
+
+    private static final String SQL_SEQUENCE = """
+            SELECT setval(pg_get_serial_sequence('account', 'user_id'),
+                                COALESCE((SELECT MAX(user_id) FROM account), 1), true);
+                    
+            SELECT setval(pg_get_serial_sequence('sport', 'sport_id'),
+                                COALESCE((SELECT MAX(sport_id) FROM sport), 1), true);
+                    
+            SELECT setval(pg_get_serial_sequence('team', 'team_id'),
+                                COALESCE((SELECT MAX(team_id) FROM team), 1), true);
+                    
+            SELECT setval(pg_get_serial_sequence('match', 'match_id'),
+                                COALESCE((SELECT MAX(match_id) FROM match), 1), true);
+                    
+            SELECT setval(pg_get_serial_sequence('rate', 'rate_id'),
+                                COALESCE((SELECT MAX(rate_id) FROM rate), 1), true);
+                    
+            SELECT setval(pg_get_serial_sequence('bet', 'bet_id'),
+                                COALESCE((SELECT MAX(bet_id) FROM bet), 1), true);
+             """;
+
+    public static boolean initialize() {
         try (Connection con = ConnectionManager.open();
              Statement stmt = con.createStatement()) {
             stmt.execute(SQL_CREATE_ACCOUNT);
@@ -90,13 +121,43 @@ public class DatabaseManager {
             stmt.execute(SQL_CREATE_RATE);
             stmt.execute(SQL_CREATE_BET);
             stmt.execute(SQL_CREATE_BET_RATE);
+
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 
-    public static void drop() throws Exception {
+    public static boolean drop() {
         try (Connection con = ConnectionManager.open();
              Statement stmt = con.createStatement()) {
             stmt.execute(SQL_DROP);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean delete() {
+        try (Connection con = ConnectionManager.open();
+             Statement stmt = con.createStatement()) {
+            stmt.execute(SQL_DELETE);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean resetSequences(){
+        try (Connection con = ConnectionManager.open();
+             Statement stmt = con.createStatement()) {
+            stmt.execute(SQL_SEQUENCE);
+
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }

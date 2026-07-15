@@ -49,7 +49,7 @@ public class MatchDAO {
 
     public List<Match> getAll() throws SQLException {
         List<Match> matchList = new ArrayList<>();
-        String sql = "SELECT * FROM MATCH ORDER BY created_at DESC";
+        String sql = "SELECT * FROM MATCH ORDER BY match_date DESC";
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {

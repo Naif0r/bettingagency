@@ -78,19 +78,24 @@ public class RegisterDialog extends JDialog {
             } else if (admin.isSelected()) {
                 role = Role.ADMIN;
             } else {
-                JOptionPane.showMessageDialog(this,
+                JOptionPane.showMessageDialog(
+                        this,
                         "Select a role",
                         "Register Error",
-                        JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.WARNING_MESSAGE
+                );
+
                 return;
             }
             Account account = accountService.register(username, password, role);
             dispose();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                    "Invalid register: " + e.getMessage(),
-                    "Register Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 }

@@ -64,7 +64,12 @@ public class ChangeAccountStatusPanel extends JFrame {
             accountsPanel.revalidate();
             accountsPanel.repaint();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -77,7 +82,12 @@ public class ChangeAccountStatusPanel extends JFrame {
             }
             updateAccountDisplay(accountService.getAll());
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -86,7 +96,12 @@ public class ChangeAccountStatusPanel extends JFrame {
             updateAccountDisplay(accountService.getAll());
             SwingUtilities.invokeLater(() -> setVisible(true));
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 }

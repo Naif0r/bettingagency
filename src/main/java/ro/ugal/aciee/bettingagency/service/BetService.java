@@ -188,7 +188,6 @@ public class BetService {
         }
 
         BetStatus betStatus = calculateBetStatus(betId);
-
         updateStatus(betId, betStatus);
 
         if (betStatus == BetStatus.WON) {

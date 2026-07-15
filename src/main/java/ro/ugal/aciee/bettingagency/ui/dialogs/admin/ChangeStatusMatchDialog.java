@@ -56,9 +56,14 @@ public class ChangeStatusMatchDialog extends JDialog {
     private void applyStatus() {
         try {
             MatchStatus matchStatus = MatchStatus.valueOf(String.valueOf(statusBox.getSelectedItem()));
+
             matchService.updateStatus(matchStatus, matchId);
+
             if (matchStatus == MatchStatus.FINISHED) {
                 matchService.getWinnerMatch(matchId);
+            }
+
+            if (matchStatus == MatchStatus.FINISHED || matchStatus == MatchStatus.CANCELLED) {
                 List<Bet> betMatchList = betService.getAllBetByMatchId(matchId);
                 for (Bet bet : betMatchList) {
                     if (bet.getBetStatus() == BetStatus.PENDING) {
@@ -66,11 +71,16 @@ public class ChangeStatusMatchDialog extends JDialog {
                     }
                 }
             }
+
             onSuccess.run();
             dispose();
-
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 }

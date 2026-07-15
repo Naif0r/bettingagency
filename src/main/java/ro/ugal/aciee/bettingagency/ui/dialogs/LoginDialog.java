@@ -62,10 +62,12 @@ public class LoginDialog extends JDialog {
             Session.login(account);
             dispose();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                    "Invalid login: " + e.getMessage(),
-                    "Login Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 }

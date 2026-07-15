@@ -70,7 +70,12 @@ public class NavPanel extends JPanel {
                 add(button);
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -96,7 +101,12 @@ public class NavPanel extends JPanel {
                         gui.showHomePanel();
                         gui.getHomeAdminPanel().updateMatchesDisplay(matchService.getBySport(sport.getSportName()));
                     } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(this, ex.getMessage());
+                        JOptionPane.showMessageDialog(
+                                this,
+                                ex.getMessage(),
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE
+                        );
                     }
                 });
                 add(button);
@@ -109,7 +119,12 @@ public class NavPanel extends JPanel {
             });
             add(filterMatchByStatus);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 

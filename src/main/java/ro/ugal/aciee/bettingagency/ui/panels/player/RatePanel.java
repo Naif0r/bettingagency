@@ -29,7 +29,7 @@ public class RatePanel extends JFrame {
 
     public RatePanel() {
         setTitle("Coupon");
-        setSize(380, 400);
+        setSize(450, 400);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
@@ -156,7 +156,12 @@ public class RatePanel extends JFrame {
             ratesPanel.revalidate();
             ratesPanel.repaint();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -171,7 +176,12 @@ public class RatePanel extends JFrame {
             updateRatesDisplay();
             JOptionPane.showMessageDialog(this, "Bet placed successfully");
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Invalid bet: " + e.getMessage(), "Bet Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 

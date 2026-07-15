@@ -53,7 +53,12 @@ public class ChangePasswordDialog extends  JDialog{
             JOptionPane.showMessageDialog(this, "Password changed successfully");
             dispose();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 }

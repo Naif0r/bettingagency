@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 public class CreateMatchDialog extends JDialog {
     private final SportService sportService = new SportService();
@@ -127,7 +128,12 @@ public class CreateMatchDialog extends JDialog {
             loadTeams();
 
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -151,7 +157,12 @@ public class CreateMatchDialog extends JDialog {
             }
 
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
 
     }
@@ -193,7 +204,12 @@ public class CreateMatchDialog extends JDialog {
             dispose();
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
 
     }

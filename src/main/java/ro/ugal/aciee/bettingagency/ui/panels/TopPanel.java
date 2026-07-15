@@ -2,18 +2,23 @@ package ro.ugal.aciee.bettingagency.ui.panels;
 
 import ro.ugal.aciee.bettingagency.model.Account;
 import ro.ugal.aciee.bettingagency.model.enums.Role;
+import ro.ugal.aciee.bettingagency.service.AccountService;
 import ro.ugal.aciee.bettingagency.ui.Session;
-import ro.ugal.aciee.bettingagency.ui.dialogs.*;
+import ro.ugal.aciee.bettingagency.ui.dialogs.ChangePasswordDialog;
+import ro.ugal.aciee.bettingagency.ui.dialogs.ChangeUsernameDialog;
+import ro.ugal.aciee.bettingagency.ui.dialogs.LoginDialog;
+import ro.ugal.aciee.bettingagency.ui.dialogs.RegisterDialog;
 import ro.ugal.aciee.bettingagency.ui.dialogs.player.DepositDialog;
 import ro.ugal.aciee.bettingagency.ui.dialogs.player.StatisticAccountDialog;
-import ro.ugal.aciee.bettingagency.utils.database.ImportAndExportManager;
 import ro.ugal.aciee.bettingagency.utils.database.DatabaseManager;
+import ro.ugal.aciee.bettingagency.utils.database.ImportAndExportManager;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 
 public class TopPanel extends JPanel {
+    private final AccountService accountService = new AccountService();
     private final JFrame parentFrame;
     private final JButton loginButton;
     private final JButton registerButton;
@@ -91,13 +96,23 @@ public class TopPanel extends JPanel {
 
             JMenuItem refresh = new JMenuItem("Refresh");
             refresh.addActionListener(e -> {
-                refreshState();
+                try {
+                    Session.login(accountService.getById(Session.getCurrentUser().getUserId()));
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage());
+                }
             });
 
             JMenuItem logout = new JMenuItem("Logout");
             logout.addActionListener(e -> {
                 Session.logout();
-                JOptionPane.showMessageDialog(this, "Successful account logout");
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Successful account logout",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+
                 refreshState();
                 updateMenuBar();
             });
@@ -156,28 +171,69 @@ public class TopPanel extends JPanel {
 
     private void saveDate() {
 
+        JFileChooser chooser = new JFileChooser();
+
+        if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+
+            String filePath = chooser.getSelectedFile().getAbsolutePath().trim();
+
+            if (!filePath.endsWith(".xlsx")) {
+                filePath += ".xlsx";
+            }
+
+            if (ImportAndExportManager.exportExcelFile(filePath)) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Data saved successfully",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            }
+        }
+
     }
 
     private void loadData() {
-        try {
-            JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = new JFileChooser();
 
-            if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                File file = chooser.getSelectedFile();
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
 
-                DatabaseManager.drop();
-                DatabaseManager.initialize();
-                ImportAndExportManager.importExcelFile(file);
-
-                JOptionPane.showMessageDialog(this, "Date loaded successfully");
+            if (!DatabaseManager.delete()) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Date not delete",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
             }
-        } catch (Exception e){
-            JOptionPane.showMessageDialog(
-                    this,
-                    e.getMessage(),
-                    "Import error",
-                    JOptionPane.ERROR_MESSAGE
-            );
+
+            if (ImportAndExportManager.importExcelFile(file)) {
+                if (!DatabaseManager.resetSequences()) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Sequences not reset",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Date loaded successfully",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            } else {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Date not load",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
         }
     }
 }
+

@@ -27,9 +27,24 @@ public class BetRateDAO {
                 stmt.executeUpdate();
                 return betRate;
             }
-        } catch (SQLException e){
+        } catch (SQLException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
+    }
+
+    public List<BetRate> getAll() throws SQLException {
+        List<BetRate> betRateList = new ArrayList<>();
+        String sql = "SELECT * FROM BET_RATE";
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    betRateList.add(new BetRate(rs.getInt("bet_id"),
+                            rs.getInt("rate_id")));
+                }
+            }
+        }
+        return betRateList;
     }
 
     public List<Rate> getByBetId(int betId) throws SQLException {
