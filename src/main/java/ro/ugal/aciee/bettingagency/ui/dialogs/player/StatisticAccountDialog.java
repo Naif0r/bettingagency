@@ -90,7 +90,7 @@ public class StatisticAccountDialog extends JDialog {
 
             account = updated;
 
-            Session.login(updated);
+            Session.refreshCurrentUser(updated);
 
             status.setText(updated.getAccountStatus().toString());
 

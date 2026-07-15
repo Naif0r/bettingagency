@@ -27,7 +27,7 @@ public class BetService {
         }
 
         if (account.getAccountStatus() == AccountStatus.BANNED) {
-            throw new IllegalArgumentException("The account is blocked and cannot place bets");
+            throw new IllegalArgumentException("Your account is banned");
         }
 
         if (rateId.isEmpty()) {

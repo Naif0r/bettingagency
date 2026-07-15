@@ -13,7 +13,7 @@ public class ChangeAccountStatusPanel extends JFrame {
     private final JPanel accountsPanel;
 
     public ChangeAccountStatusPanel() {
-        setTitle("Change Account Status");
+        setTitle("Manager Account Status");
         setSize(380, 400);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -21,7 +21,9 @@ public class ChangeAccountStatusPanel extends JFrame {
 
         accountsPanel = new JPanel();
         accountsPanel.setLayout(new BoxLayout(accountsPanel, BoxLayout.Y_AXIS));
+
         JScrollPane scrollPane = new JScrollPane(accountsPanel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(24);
         add(scrollPane, BorderLayout.CENTER);
     }
 

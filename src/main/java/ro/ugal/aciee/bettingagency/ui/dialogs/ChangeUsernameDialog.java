@@ -49,7 +49,7 @@ public class ChangeUsernameDialog extends JDialog {
             String newName = newUsername.getText();
             int userId = Session.getCurrentUser().getUserId();
             accountService.updateUsername(newName, userId);
-            Session.login(accountService.getById(userId));
+            Session.refreshCurrentUser(accountService.getById(Session.getCurrentUser().getUserId()));
             JOptionPane.showMessageDialog(this, "Username changed successfully");
             dispose();
         } catch (Exception e) {

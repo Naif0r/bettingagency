@@ -67,7 +67,7 @@ public class TopPanel extends JPanel {
             refreshState();
         });
 
-        Session.addListener(() -> {
+        Session.addAccountChangeListener(() -> {
             refreshState();
             updateMenuBar();
         });
@@ -97,7 +97,7 @@ public class TopPanel extends JPanel {
             JMenuItem refresh = new JMenuItem("Refresh");
             refresh.addActionListener(e -> {
                 try {
-                    Session.login(accountService.getById(Session.getCurrentUser().getUserId()));
+                    Session.refreshCurrentUser(accountService.getById(Session.getCurrentUser().getUserId()));
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(this, ex.getMessage());
                 }

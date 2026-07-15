@@ -1,10 +1,13 @@
 package ro.ugal.aciee.bettingagency.ui.dialogs.admin;
 
 import ro.ugal.aciee.bettingagency.model.Bet;
+import ro.ugal.aciee.bettingagency.model.Rate;
 import ro.ugal.aciee.bettingagency.model.enums.BetStatus;
 import ro.ugal.aciee.bettingagency.model.enums.MatchStatus;
+import ro.ugal.aciee.bettingagency.model.enums.RateStatus;
 import ro.ugal.aciee.bettingagency.service.BetService;
 import ro.ugal.aciee.bettingagency.service.MatchService;
+import ro.ugal.aciee.bettingagency.service.RateService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +19,7 @@ public class ChangeStatusMatchDialog extends JDialog {
     private final int matchId;
     private final MatchService matchService = new MatchService();
     private final BetService betService = new BetService();
+    private final RateService rateService = new RateService();
 
     public ChangeStatusMatchDialog(int matchId, Runnable onSuccess) {
         setTitle("Change status match");
@@ -65,6 +69,12 @@ public class ChangeStatusMatchDialog extends JDialog {
 
             if (matchStatus == MatchStatus.FINISHED || matchStatus == MatchStatus.CANCELLED) {
                 List<Bet> betMatchList = betService.getAllBetByMatchId(matchId);
+                List<Rate> rateList = rateService.getByMatchId(matchId);
+
+                for(Rate rate : rateList){
+                    rateService.updateStatus(rate.getRateId(), RateStatus.CLOSED);
+                }
+
                 for (Bet bet : betMatchList) {
                     if (bet.getBetStatus() == BetStatus.PENDING) {
                         betService.settleBet(bet.getBetId());

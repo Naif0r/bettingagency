@@ -39,7 +39,7 @@ public class BettingAgencyGUI extends JFrame {
         add(topContainer, BorderLayout.NORTH);
         add(centerContainer, BorderLayout.CENTER);
 
-        Session.addListener(this::refreshView);
+        Session.addAuthChangeListener(this::refreshView);
         refreshView();
     }
 

@@ -37,6 +37,8 @@ public class BetUserPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(wrapperPanel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(24);
 
         add(createBetsTagsPanel(), BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
@@ -108,7 +110,7 @@ public class BetUserPanel extends JPanel {
         JPanel betPanel = new JPanel(new BorderLayout());
         betPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         betPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300));
-        betPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 200));
+        betPanel.setPreferredSize(new Dimension(350, 200));
 
         try {
 
@@ -192,7 +194,7 @@ public class BetUserPanel extends JPanel {
     private void cashOut(Bet bet) {
         try {
             betService.settleBetCashOut(bet.getBetId());
-            Session.login(accountService.getById(Session.getCurrentUser().getUserId()));
+            Session.refreshCurrentUser(accountService.getById(Session.getCurrentUser().getUserId()));
             loadUserBets();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(

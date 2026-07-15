@@ -29,7 +29,7 @@ public class CreateMatchDialog extends JDialog {
     public CreateMatchDialog() {
         setTitle("Create Match");
 
-        setSize(600, 350);
+        setSize(480, 250);
         setLocationRelativeTo(null);
 
         JPanel createMatchPanel = new JPanel(new GridBagLayout());

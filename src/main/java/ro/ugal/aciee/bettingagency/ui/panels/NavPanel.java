@@ -26,7 +26,7 @@ public class NavPanel extends JPanel {
     public NavPanel(BettingAgencyGUI gui) {
         this.gui = gui;
         setLayout(new FlowLayout(FlowLayout.LEFT));
-        Session.addListener(this::rebuild);
+        Session.addAuthChangeListener(this::rebuild);
         rebuild();
     }
 
