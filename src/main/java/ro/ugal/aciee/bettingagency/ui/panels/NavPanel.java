@@ -1,5 +1,6 @@
 package ro.ugal.aciee.bettingagency.ui.panels;
 
+import ro.ugal.aciee.bettingagency.model.Match;
 import ro.ugal.aciee.bettingagency.model.Sport;
 import ro.ugal.aciee.bettingagency.model.enums.MatchStatus;
 import ro.ugal.aciee.bettingagency.model.enums.Role;
@@ -13,6 +14,7 @@ import ro.ugal.aciee.bettingagency.ui.panels.admin.ChangeAccountStatusPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLException;
 import java.util.List;
 
 public class NavPanel extends JPanel {
@@ -41,13 +43,22 @@ public class NavPanel extends JPanel {
 
     private void buildPlayerButtons() {
         try {
+            JButton homePageMatchButton = new JButton("HOME");
+            homePageMatchButton.addActionListener(e -> {
+                try {
+                    updatePlayerDisplay(matchService.getByExistsStatus());
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+            add(homePageMatchButton);
+
             JButton liveMatchButton = new JButton("LIVE");
             liveMatchButton.addActionListener(e -> {
                 try {
-                    gui.showHomePanel();
-                    gui.getHomePanel().updateMatchesDisplay(matchService.getByStatus(MatchStatus.LIVE));
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, ex.getMessage());
+                    updatePlayerDisplay(matchService.getByStatus(MatchStatus.LIVE));
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
                 }
             });
             add(liveMatchButton);
@@ -61,10 +72,9 @@ public class NavPanel extends JPanel {
                 JButton button = new JButton(sport.getSportName());
                 button.addActionListener(e -> {
                     try {
-                        gui.showHomePanel();
-                        gui.getHomePanel().updateMatchesDisplay(matchService.getBySport(sport.getSportName()));
-                    } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(this, ex.getMessage());
+                        updatePlayerDisplay(matchService.getBySport(sport.getSportName()));
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
                     }
                 });
                 add(button);
@@ -122,6 +132,20 @@ public class NavPanel extends JPanel {
             JOptionPane.showMessageDialog(
                     this,
                     e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    private void updatePlayerDisplay(List<Match> matches) {
+        try {
+            gui.showHomePanel();
+            gui.getHomePanel().updateMatchesDisplay(matches);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE
             );

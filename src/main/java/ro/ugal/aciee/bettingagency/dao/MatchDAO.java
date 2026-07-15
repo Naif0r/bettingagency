@@ -107,7 +107,7 @@ public class MatchDAO {
 
     public List<Match> getByExistsStatus() throws SQLException{
         List<Match> matchList = new ArrayList<>();
-        String sql = "SELECT * FROM MATCH WHERE match_status IN (?, ?) ORDER BY match_date DESC";
+        String sql = "SELECT * FROM MATCH WHERE match_status IN (?, ?) ORDER BY match_date ASC";
         try(Connection con = ConnectionManager.open();
             PreparedStatement stmt = con.prepareStatement(sql)){
             stmt.setString(1, MatchStatus.UPCOMING.name());

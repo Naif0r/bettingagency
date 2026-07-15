@@ -4,7 +4,6 @@ import ro.ugal.aciee.bettingagency.model.Match;
 import ro.ugal.aciee.bettingagency.model.Team;
 import ro.ugal.aciee.bettingagency.model.enums.MatchTeam;
 import ro.ugal.aciee.bettingagency.service.MatchService;
-import ro.ugal.aciee.bettingagency.service.RateService;
 import ro.ugal.aciee.bettingagency.service.TeamService;
 import ro.ugal.aciee.bettingagency.ui.dialogs.admin.ChangeStatusMatchDialog;
 
@@ -17,17 +16,20 @@ import java.util.List;
 public class HomeAdminPanel extends JPanel {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("d.M.yyyy, HH:mm");
     private final JPanel centerMatchesPanel;
+    private final JPanel wrapperPanel;
     private final TeamService teamService = new TeamService();
-    private final RateService rateService = new RateService();
     private final MatchService matchService = new MatchService();
 
     public HomeAdminPanel() {
         setLayout(new BorderLayout());
 
         centerMatchesPanel = new JPanel();
-        centerMatchesPanel.setLayout(new GridLayout(0, 3, 15, 15));
 
-        JScrollPane scrollPane = new JScrollPane(centerMatchesPanel);
+        wrapperPanel = new JPanel(new BorderLayout());
+        wrapperPanel.add(centerMatchesPanel, BorderLayout.NORTH);
+
+        JScrollPane scrollPane = new JScrollPane(wrapperPanel);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
         add(scrollPane, BorderLayout.CENTER);
 
         defaultMatches();
@@ -35,31 +37,26 @@ public class HomeAdminPanel extends JPanel {
 
     public void updateMatchesDisplay(List<Match> matches) {
         try {
+            wrapperPanel.removeAll();
             centerMatchesPanel.removeAll();
 
             if (matches.isEmpty()) {
-                centerMatchesPanel.setLayout(new BorderLayout());
-                centerMatchesPanel.add(new JLabel("No matches found for this sport", SwingConstants.CENTER), BorderLayout.CENTER);
-                centerMatchesPanel.revalidate();
-                centerMatchesPanel.repaint();
-                return;
-            }
+                JPanel emptyPanel = new JPanel(new GridBagLayout());
+                JLabel emptyLabel = new JLabel("No matches found");
+                emptyPanel.add(emptyLabel);
 
-            centerMatchesPanel.setLayout(new BoxLayout(centerMatchesPanel, BoxLayout.Y_AXIS));
+                wrapperPanel.add(emptyPanel, BorderLayout.CENTER);
+            } else {
+                wrapperPanel.add(centerMatchesPanel, BorderLayout.NORTH);
+                centerMatchesPanel.setLayout(new GridLayout(0, 3, 15, 15));
 
-            int perRow = 3;
-            JPanel currentRow = null;
-
-            for (int i = 0; i < matches.size(); i++) {
-                if (i % perRow == 0) {
-                    currentRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
-                    centerMatchesPanel.add(currentRow);
+                for (Match match : matches) {
+                    centerMatchesPanel.add(createMatchAdminPanel(match));
                 }
-                currentRow.add(createMatchPanel(matches.get(i)));
             }
 
-            centerMatchesPanel.revalidate();
-            centerMatchesPanel.repaint();
+            wrapperPanel.revalidate();
+            wrapperPanel.repaint();
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(
@@ -71,11 +68,10 @@ public class HomeAdminPanel extends JPanel {
         }
     }
 
-    private JPanel createMatchPanel(Match match) throws SQLException {
+    private JPanel createMatchAdminPanel(Match match) throws SQLException {
         JPanel matchPanel = new JPanel(new BorderLayout());
-        matchPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-        matchPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
-        matchPanel.setPreferredSize(new Dimension(300, 120));
+        matchPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        matchPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 120));
 
         JPanel top = new JPanel(new BorderLayout());
 

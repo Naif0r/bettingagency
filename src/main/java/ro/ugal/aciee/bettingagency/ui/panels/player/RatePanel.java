@@ -99,7 +99,7 @@ public class RatePanel extends JFrame {
 
     private JPanel createRatePanel(Rate rate) throws SQLException {
         JPanel ratePanel = new JPanel(new BorderLayout());
-        ratePanel.setBorder(BorderFactory.createLineBorder(Color.CYAN));
+        ratePanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         ratePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
 
         Match match = matchService.getById(rate.getMatchId());
@@ -117,7 +117,7 @@ public class RatePanel extends JFrame {
             updateRatesDisplay();
         });
 
-        JPanel middle = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel middle = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         middle.add(clearRateButton);
 
         ratePanel.add(info, BorderLayout.WEST);

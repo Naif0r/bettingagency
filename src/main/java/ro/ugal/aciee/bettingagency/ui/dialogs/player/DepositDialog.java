@@ -49,7 +49,8 @@ public class DepositDialog extends JDialog {
             accountService.deposit(Session.getCurrentUser().getUserId(),
                     Double.parseDouble(depositField.getText()));
             Session.login(accountService.getById(Session.getCurrentUser().getUserId()));
-            JOptionPane.showMessageDialog(this, "The replenishment was successful");
+            JOptionPane.showMessageDialog(this, "The replenishment was successful: " + depositField.getText() + "$");
+            depositField.setText("");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(
                     this,

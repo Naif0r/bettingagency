@@ -156,7 +156,7 @@ public class TopPanel extends JPanel {
             add(userLabel);
 
             if (user.getRole() == Role.PLAYER) {
-                userBalanceLabel.setText(String.valueOf(user.getBalance()));
+                userBalanceLabel.setText(user.getBalance() + "$");
                 add(userBalanceLabel);
                 add(depositButton);
                 add(statisticButton);

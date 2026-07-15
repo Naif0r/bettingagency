@@ -21,9 +21,9 @@ public class BetUserPanel extends JPanel {
     private final AccountService accountService = new AccountService();
     private final BetService betService = new BetService();
     private final MatchService matchService = new MatchService();
-    private final RateService rateService = new RateService();
     private final TeamService teamService = new TeamService();
     private final JPanel centerBetsPanel;
+    private final JPanel wrapperPanel;
     private List<Bet> betsByStatus = new ArrayList<>();
 
     public BetUserPanel() {
@@ -32,7 +32,12 @@ public class BetUserPanel extends JPanel {
         centerBetsPanel = new JPanel();
         centerBetsPanel.setLayout(new GridLayout(0, 3, 15, 15));
 
-        JScrollPane scrollPane = new JScrollPane(centerBetsPanel);
+        wrapperPanel = new JPanel(new BorderLayout());
+        wrapperPanel.add(centerBetsPanel, BorderLayout.NORTH);
+
+        JScrollPane scrollPane = new JScrollPane(wrapperPanel);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
         add(createBetsTagsPanel(), BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
     }
@@ -68,31 +73,26 @@ public class BetUserPanel extends JPanel {
 
     public void updateBetsDisplay() {
         try {
+            wrapperPanel.removeAll();
             centerBetsPanel.removeAll();
 
             if (betsByStatus.isEmpty()) {
-                centerBetsPanel.setLayout(new BorderLayout());
-                centerBetsPanel.add(new JLabel("No bets found", SwingConstants.CENTER), BorderLayout.CENTER);
-                centerBetsPanel.revalidate();
-                centerBetsPanel.repaint();
-                return;
-            }
+                JPanel emptyPanel = new JPanel(new GridBagLayout());
+                JLabel emptyLabel = new JLabel("No bets found");
+                emptyPanel.add(emptyLabel);
 
-            centerBetsPanel.setLayout(new BoxLayout(centerBetsPanel, BoxLayout.Y_AXIS));
+                wrapperPanel.add(emptyPanel, BorderLayout.CENTER);
+            }else {
+                wrapperPanel.add(centerBetsPanel, BorderLayout.NORTH);
+                centerBetsPanel.setLayout(new GridLayout(0, 3, 15, 15));
 
-            int perRow = 3;
-            JPanel currentRow = null;
-
-            for (int i = 0; i < betsByStatus.size(); i++) {
-                if (i % perRow == 0) {
-                    currentRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
-                    centerBetsPanel.add(currentRow);
+                for (Bet bet : betsByStatus) {
+                    centerBetsPanel.add(createBetPanel(bet));
                 }
-                currentRow.add(createBetPanel(betsByStatus.get(i)));
             }
 
-            centerBetsPanel.revalidate();
-            centerBetsPanel.repaint();
+            wrapperPanel.revalidate();
+            wrapperPanel.repaint();
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(
@@ -106,9 +106,9 @@ public class BetUserPanel extends JPanel {
 
     private JPanel createBetPanel(Bet bet) {
         JPanel betPanel = new JPanel(new BorderLayout());
-        betPanel.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+        betPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         betPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300));
-        betPanel.setPreferredSize(new Dimension(350, 200));
+        betPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 200));
 
         try {
 

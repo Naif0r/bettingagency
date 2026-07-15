@@ -41,7 +41,7 @@ public class StatisticAccountDialog extends JDialog {
         top.add(new JLabel("Bet statistic"), BorderLayout.EAST);
 
         JPanel center = new JPanel(new BorderLayout());
-        center.add(new JLabel("Balance: " + account.getBalance()), BorderLayout.WEST);
+        center.add(new JLabel("Balance: " + account.getBalance() + "$"), BorderLayout.WEST);
 
         JPanel betStatPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
         betStatPanel.add(winBetLabel);
