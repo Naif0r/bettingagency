@@ -166,10 +166,6 @@ public class BetService {
                 return BetStatus.CANCELED;
             }
 
-            if (match.getMatchStatus() != MatchStatus.FINISHED) {
-                throw new IllegalArgumentException("Match must be finished");
-            }
-
             RateType winner = matchService.getWinnerMatch(match.getMatchId());
 
             if (winner != rate.getType()) {
