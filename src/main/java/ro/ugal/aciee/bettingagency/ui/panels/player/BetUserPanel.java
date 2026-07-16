@@ -30,7 +30,6 @@ public class BetUserPanel extends JPanel {
         setLayout(new BorderLayout());
 
         centerBetsPanel = new JPanel();
-        centerBetsPanel.setLayout(new GridLayout(0, 3, 15, 15));
 
         wrapperPanel = new JPanel(new BorderLayout());
         wrapperPanel.add(centerBetsPanel, BorderLayout.NORTH);
@@ -147,15 +146,12 @@ public class BetUserPanel extends JPanel {
                     "Status: " + bet.getBetStatus() +
                     "</html>");
 
-            for (Match match : matchList) {
-                if (match.getMatchStatus() == MatchStatus.UPCOMING || match.getMatchStatus() == MatchStatus.LIVE) {
-                    if (bet.getBetStatus() == BetStatus.PENDING) {
-                        JButton cashOutButton = new JButton("Cash out");
-                        cashOutButton.addActionListener(e -> cashOut(bet));
-                        southPanel.add(cashOutButton, BorderLayout.EAST);
-                    }
-                }
+            if (bet.getBetStatus() == BetStatus.PENDING) {
+                JButton cashOutButton = new JButton("Cash out");
+                cashOutButton.addActionListener(e -> cashOut(bet));
+                southPanel.add(cashOutButton, BorderLayout.EAST);
             }
+
 
             southPanel.add(betInfo, BorderLayout.WEST);
 

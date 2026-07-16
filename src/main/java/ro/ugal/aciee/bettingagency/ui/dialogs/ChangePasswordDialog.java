@@ -48,9 +48,12 @@ public class ChangePasswordDialog extends  JDialog{
         try {
             String newPass = newPasswordField.getText();
             int userId = Session.getCurrentUser().getUserId();
+
             accountService.updatePassword(newPass, userId);
             Session.refreshCurrentUser(accountService.getById(Session.getCurrentUser().getUserId()));
+
             JOptionPane.showMessageDialog(this, "Password changed successfully");
+
             dispose();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(

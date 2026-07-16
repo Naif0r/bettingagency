@@ -97,8 +97,8 @@ public class MatchService {
         return matchDAO.getByStatus(matchStatus);
     }
 
-    public List<Match> getByExistsStatus() throws SQLException {
-        return matchDAO.getByExistsStatus();
+    public List<Match> getAllActiveMatches() throws SQLException {
+        return matchDAO.getAllActiveMatches();
     }
 
     public boolean updateStatus(MatchStatus matchStatus, int matchId) throws SQLException {
@@ -189,6 +189,16 @@ public class MatchService {
         return RateType.WIN2;
     }
 
+    public List<Match> getActiveMatchesBySport(String sportName) throws SQLException {
+        sportName = sportName.trim();
+
+        if(sportName.isBlank()){
+            throw new IllegalArgumentException("Sport name is blank");
+        }
+
+        return matchDAO.getActiveMatchesBySport(sportName);
+    }
+
     public boolean delete(int matchId) throws SQLException {
         getById(matchId);
         return matchDAO.delete(matchId);
@@ -201,5 +211,4 @@ public class MatchService {
     public MatchTeamNamesDTO getMatchTeams(int matchId) throws SQLException {
         return matchDAO.getMatchTeams(matchId);
     }
-
 }

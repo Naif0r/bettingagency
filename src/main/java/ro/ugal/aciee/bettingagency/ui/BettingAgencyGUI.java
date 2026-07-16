@@ -60,8 +60,17 @@ public class BettingAgencyGUI extends JFrame {
     }
 
     public void showBetsPanel() {
-        betUserPanel.loadUserBets();
-        cardLayout.show(centerContainer, "BETS");
+        if (Session.isLoggedIn()){
+            betUserPanel.loadUserBets();
+            cardLayout.show(centerContainer, "BETS");
+        } else {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "To view your bets, you need to log in to your account",
+                    "Bet user",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+        }
     }
 
     public void showHomePanel() {

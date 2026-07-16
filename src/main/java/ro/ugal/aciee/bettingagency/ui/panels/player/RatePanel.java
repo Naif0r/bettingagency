@@ -37,6 +37,7 @@ public class RatePanel extends JFrame {
         ratesPanel = new JPanel();
         ratesPanel.setLayout(new BoxLayout(ratesPanel, BoxLayout.Y_AXIS));
         JScrollPane scrollPane = new JScrollPane(ratesPanel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(24);
         add(scrollPane, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new GridBagLayout());

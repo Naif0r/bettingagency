@@ -85,7 +85,7 @@ public class HomePanel extends JPanel {
         String team1 = matchOddDTOList.getFirst().team1Name();
         String team2 = matchOddDTOList.getFirst().team2Name();
 
-        JPanel centerPanel = new JPanel(new BorderLayout());
+        JPanel center = new JPanel(new BorderLayout());
 
         JLabel team = new JLabel("<html>" +
                 team1 +
@@ -100,8 +100,8 @@ public class HomePanel extends JPanel {
 
         team.setFont(new Font("Arial", Font.BOLD, 18));
         score.setFont(new Font("Arial", Font.BOLD, 18));
-        centerPanel.add(team, BorderLayout.WEST);
-        centerPanel.add(score, BorderLayout.EAST);
+        center.add(team, BorderLayout.WEST);
+        center.add(score, BorderLayout.EAST);
 
         JPanel bottom = new JPanel(new FlowLayout());
 
@@ -122,7 +122,7 @@ public class HomePanel extends JPanel {
         }
 
         matchPanel.add(top, BorderLayout.NORTH);
-        matchPanel.add(centerPanel, BorderLayout.CENTER);
+        matchPanel.add(center, BorderLayout.CENTER);
         matchPanel.add(bottom, BorderLayout.SOUTH);
 
         return matchPanel;
@@ -130,7 +130,7 @@ public class HomePanel extends JPanel {
 
     private void defaultMatches() {
         try {
-            updateMatchesDisplay(matchService.getByExistsStatus());
+            updateMatchesDisplay(matchService.getAllActiveMatches());
         } catch (Exception e) {
             JOptionPane.showMessageDialog(
                     this,

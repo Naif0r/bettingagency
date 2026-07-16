@@ -30,10 +30,11 @@ public class StatisticAccountDialog extends JDialog {
         statisticPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
         statisticPanel.setPreferredSize(new Dimension(200, 80));
 
-        account = Session.getCurrentUser();
         winBetLabel = new JLabel();
         loseBetLabel = new JLabel();
         status = new JLabel();
+
+        refreshAccount();
         betStatus();
 
         JPanel top = new JPanel(new BorderLayout());
@@ -51,9 +52,6 @@ public class StatisticAccountDialog extends JDialog {
 
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
         bottom.add(new JLabel("Account status: "));
-
-        refreshStatus();
-
         bottom.add(status);
 
         statisticPanel.add(top, BorderLayout.NORTH);
@@ -84,29 +82,20 @@ public class StatisticAccountDialog extends JDialog {
         }
     }
 
-    private void refreshStatus() {
+    private void refreshAccount() {
         try {
-            Account updated = accountService.getById(account.getUserId());
+            account = accountService.getById(Session.getCurrentUser().getUserId());
+            Session.refreshCurrentUser(account);
 
-            account = updated;
+            status.setText(account.getAccountStatus().toString());
 
-            Session.refreshCurrentUser(updated);
-
-            status.setText(updated.getAccountStatus().toString());
-
-            if (updated.getAccountStatus() == AccountStatus.ACTIVE) {
+            if (account.getAccountStatus() == AccountStatus.ACTIVE){
                 status.setForeground(Color.GREEN);
             } else {
                 status.setForeground(Color.RED);
             }
-
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

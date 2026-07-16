@@ -155,6 +155,10 @@ public class AccountService {
         username = username.trim();
         password = password.trim();
 
+        if (username.isBlank()) {
+            throw new IllegalArgumentException("Password is blank");
+        }
+
         if (password.isBlank()) {
             throw new IllegalArgumentException("Password is blank");
         }

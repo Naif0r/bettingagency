@@ -17,6 +17,7 @@ public class HomeAdminPanel extends JPanel {
     private final JPanel centerMatchesPanel;
     private final JPanel wrapperPanel;
     private final MatchService matchService = new MatchService();
+    private List<Match> matches;
 
     public HomeAdminPanel() {
         setLayout(new BorderLayout());
@@ -39,6 +40,8 @@ public class HomeAdminPanel extends JPanel {
         try {
             wrapperPanel.removeAll();
             centerMatchesPanel.removeAll();
+
+            this.matches = matches;
 
             if (matches.isEmpty()) {
                 JPanel emptyPanel = new JPanel(new GridBagLayout());
@@ -83,7 +86,7 @@ public class HomeAdminPanel extends JPanel {
         String team1 = matchTeamNamesDTO.team1Name();
         String team2 = matchTeamNamesDTO.team2Name();
 
-        JPanel centerPanel = new JPanel(new BorderLayout());
+        JPanel center = new JPanel(new BorderLayout());
 
         JLabel team = new JLabel("<html>" +
                 team1 +
@@ -98,8 +101,8 @@ public class HomeAdminPanel extends JPanel {
 
         team.setFont(new Font("Arial", Font.BOLD, 18));
         score.setFont(new Font("Arial", Font.BOLD, 18));
-        centerPanel.add(team, BorderLayout.WEST);
-        centerPanel.add(score, BorderLayout.EAST);
+        center.add(team, BorderLayout.WEST);
+        center.add(score, BorderLayout.EAST);
 
         JPanel bottom = new JPanel(new FlowLayout());
 
@@ -116,7 +119,7 @@ public class HomeAdminPanel extends JPanel {
         bottom.add(addScoreTeam2);
 
         matchPanel.add(top, BorderLayout.NORTH);
-        matchPanel.add(centerPanel, BorderLayout.CENTER);
+        matchPanel.add(center, BorderLayout.CENTER);
         matchPanel.add(bottom, BorderLayout.SOUTH);
 
         return matchPanel;
@@ -125,7 +128,7 @@ public class HomeAdminPanel extends JPanel {
     private void addScore(int matchId, MatchTeam matchTeam) {
         try {
             matchService.updateScoreTeam(matchId, matchTeam);
-            defaultMatches();
+            refreshMatchCard(matchId);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(
                     this,
@@ -137,13 +140,46 @@ public class HomeAdminPanel extends JPanel {
     }
 
     private void updateStatusMatchById(int matchId) {
-        ChangeStatusMatchDialog dialog = new ChangeStatusMatchDialog(matchId, this::defaultMatches);
+        ChangeStatusMatchDialog dialog = new ChangeStatusMatchDialog(matchId, () -> refreshMatchCard(matchId));
         dialog.setVisible(true);
     }
 
     private void defaultMatches() {
         try {
-            updateMatchesDisplay(matchService.getByExistsStatus());
+            updateMatchesDisplay(matchService.getAllActiveMatches());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    private void refreshMatchCard(int matchId) {
+        try {
+            int index = -1;
+            for (int i = 0; i < matches.size(); i++) {
+                if (matches.get(i).getMatchId() == matchId) {
+                    index = i;
+                    break;
+                }
+            }
+
+            if (index == -1) {
+                return;
+            }
+
+            Match freshMatch = matchService.getById(matchId);
+            matches.set(index, freshMatch);
+
+            JPanel newPanel = createMatchAdminPanel(freshMatch);
+            centerMatchesPanel.remove(index);
+            centerMatchesPanel.add(newPanel, index);
+
+            centerMatchesPanel.revalidate();
+            centerMatchesPanel.repaint();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(
                     this,

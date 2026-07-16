@@ -46,11 +46,22 @@ public class DepositDialog extends JDialog {
 
     private void replenishBalance() {
         try {
-            accountService.deposit(Session.getCurrentUser().getUserId(),
-                    Double.parseDouble(depositField.getText()));
-            Session.refreshCurrentUser(accountService.getById(Session.getCurrentUser().getUserId()));
-            JOptionPane.showMessageDialog(this, "The replenishment was successful: " + depositField.getText() + "$");
-            depositField.setText("");
+            if (accountService.deposit(Session.getCurrentUser().getUserId(),
+                    Double.parseDouble(depositField.getText()))) {
+                Session.refreshCurrentUser(accountService.getById(Session.getCurrentUser().getUserId()));
+                JOptionPane.showMessageDialog(
+                        this,
+                        "The replenishment was successful: " +
+                                depositField.getText() + "$");
+                depositField.setText("");
+            } else {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "The recharge failed",
+                        "Replenishment Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(
                     this,

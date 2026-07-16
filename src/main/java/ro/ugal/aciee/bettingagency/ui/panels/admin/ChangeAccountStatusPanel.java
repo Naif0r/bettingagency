@@ -82,6 +82,7 @@ public class ChangeAccountStatusPanel extends JFrame {
             } else {
                 accountService.updateStatus(account.getUserId(), AccountStatus.ACTIVE);
             }
+
             updateAccountDisplay(accountService.getAll());
         } catch (Exception e) {
             JOptionPane.showMessageDialog(

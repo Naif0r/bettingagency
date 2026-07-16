@@ -58,8 +58,10 @@ public class LoginDialog extends JDialog {
         try {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
+
             Account account = accountService.login(username, password);
             Session.login(account);
+
             dispose();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(

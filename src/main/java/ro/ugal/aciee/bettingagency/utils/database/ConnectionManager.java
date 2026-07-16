@@ -17,7 +17,7 @@ public class ConnectionManager {
                     PropertiesUtil.get(USERNAME_KEY),
                     PropertiesUtil.get(PASSWORD_KEY));
         } catch (SQLException e){
-            throw new RuntimeException(e);
+            throw new RuntimeException("Cannot connect to database", e);
         }
     }
 }

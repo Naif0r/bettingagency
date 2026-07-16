@@ -110,13 +110,36 @@ public class MatchDAO {
         return matchList;
     }
 
-    public List<Match> getByExistsStatus() throws SQLException {
+    public List<Match> getAllActiveMatches() throws SQLException {
         List<Match> matchList = new ArrayList<>();
         String sql = "SELECT * FROM MATCH WHERE match_status IN (?, ?) ORDER BY match_date ASC";
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, MatchStatus.UPCOMING.name());
             stmt.setString(2, MatchStatus.LIVE.name());
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    matchList.add(mapMatch(rs));
+                }
+            }
+        }
+        return matchList;
+    }
+
+    public List<Match> getActiveMatchesBySport(String sportName) throws SQLException {
+        List<Match> matchList = new ArrayList<>();
+        String sql = """
+                SELECT m.* FROM MATCH m
+                JOIN SPORT s ON m.sport_id = s.sport_id
+                WHERE s.sport_name = ? 
+                AND m.match_status IN (?, ?) 
+                ORDER BY m.match_date ASC
+                """;
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, sportName);
+            stmt.setString(2, MatchStatus.UPCOMING.name());
+            stmt.setString(3, MatchStatus.LIVE.name());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     matchList.add(mapMatch(rs));

@@ -46,9 +46,14 @@ public class NavPanel extends JPanel {
             JButton homePageMatchButton = new JButton("HOME");
             homePageMatchButton.addActionListener(e -> {
                 try {
-                    updatePlayerDisplay(matchService.getByExistsStatus());
+                    updatePlayerDisplay(matchService.getAllActiveMatches());
                 } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
+                    JOptionPane.showMessageDialog(
+                            this,
+                            ex.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                 }
             });
             add(homePageMatchButton);
@@ -58,7 +63,12 @@ public class NavPanel extends JPanel {
                 try {
                     updatePlayerDisplay(matchService.getByStatus(MatchStatus.LIVE));
                 } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
+                    JOptionPane.showMessageDialog(
+                            this,
+                            ex.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                 }
             });
             add(liveMatchButton);
@@ -72,9 +82,14 @@ public class NavPanel extends JPanel {
                 JButton button = new JButton(sport.getSportName());
                 button.addActionListener(e -> {
                     try {
-                        updatePlayerDisplay(matchService.getBySport(sport.getSportName()));
+                        updatePlayerDisplay(matchService.getActiveMatchesBySport(sport.getSportName()));
                     } catch (SQLException ex) {
-                        throw new RuntimeException(ex);
+                        JOptionPane.showMessageDialog(
+                                this,
+                                ex.getMessage(),
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE
+                        );
                     }
                 });
                 add(button);

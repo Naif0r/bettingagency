@@ -1,6 +1,5 @@
 package ro.ugal.aciee.bettingagency.ui.dialogs;
 
-import ro.ugal.aciee.bettingagency.model.Account;
 import ro.ugal.aciee.bettingagency.model.enums.Role;
 import ro.ugal.aciee.bettingagency.service.AccountService;
 
@@ -72,7 +71,9 @@ public class RegisterDialog extends JDialog {
         try {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
+
             Role role;
+
             if (player.isSelected()) {
                 role = Role.PLAYER;
             } else if (admin.isSelected()) {
@@ -87,7 +88,9 @@ public class RegisterDialog extends JDialog {
 
                 return;
             }
-            Account account = accountService.register(username, password, role);
+
+            accountService.register(username, password, role);
+
             dispose();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(
