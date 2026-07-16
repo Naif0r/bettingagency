@@ -9,8 +9,10 @@ import java.util.List;
 
 public class SportDAO {
     public Sport save(Sport sport) throws SQLException {
-        String sql = "INSERT INTO SPORT(sport_name)" +
-                "VALUES (?)";
+        String sql = """
+                INSERT INTO SPORT(sport_name)
+                VALUES (?);
+                """;
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, sport.getSportName());
@@ -28,8 +30,8 @@ public class SportDAO {
                 INSERT INTO SPORT (sport_id, sport_name)
                 VALUES (?, ?);
                 """;
-        try(Connection con = ConnectionManager.open();
-            PreparedStatement stmt = con.prepareStatement(sql)){
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, sport.getSportId());
             stmt.setString(2, sport.getSportName());
             stmt.executeUpdate();

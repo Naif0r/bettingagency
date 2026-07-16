@@ -3,9 +3,7 @@ package ro.ugal.aciee.bettingagency.dao;
 import ro.ugal.aciee.bettingagency.dto.BetLegDTO;
 import ro.ugal.aciee.bettingagency.dto.MatchTeamNamesDTO;
 import ro.ugal.aciee.bettingagency.model.Match;
-import ro.ugal.aciee.bettingagency.model.Rate;
 import ro.ugal.aciee.bettingagency.model.enums.MatchStatus;
-import ro.ugal.aciee.bettingagency.model.enums.RateStatus;
 import ro.ugal.aciee.bettingagency.model.enums.RateType;
 import ro.ugal.aciee.bettingagency.utils.database.ConnectionManager;
 
@@ -15,8 +13,10 @@ import java.util.List;
 
 public class MatchDAO {
     public Match save(Match match) throws SQLException {
-        String sql = "INSERT INTO MATCH (sport_id, team1_id, team2_id, match_date)" +
-                "VALUES (?, ?, ?, ?)";
+        String sql = """
+                INSERT INTO MATCH (sport_id, team1_id, team2_id, match_date) 
+                VALUES (?, ?, ?, ?);
+                """;
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, match.getSportId());
@@ -241,13 +241,5 @@ public class MatchDAO {
                 MatchStatus.valueOf(rs.getString("match_status")),
                 rs.getInt("team1_score"),
                 rs.getInt("team2_score"));
-    }
-
-    private Rate mapRate(ResultSet rs) throws SQLException {
-        return new Rate(rs.getInt("rate_id"),
-                rs.getInt("match_id"),
-                RateType.valueOf(rs.getString("type")),
-                rs.getDouble("value"),
-                RateStatus.valueOf(rs.getString("rate_status")));
     }
 }

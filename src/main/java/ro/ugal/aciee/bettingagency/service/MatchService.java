@@ -192,7 +192,7 @@ public class MatchService {
     public List<Match> getActiveMatchesBySport(String sportName) throws SQLException {
         sportName = sportName.trim();
 
-        if(sportName.isBlank()){
+        if (sportName.isBlank()) {
             throw new IllegalArgumentException("Sport name is blank");
         }
 

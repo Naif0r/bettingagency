@@ -8,5 +8,5 @@ public record BetLegDTO(
         String team1Name,
         String team2Name,
         RateType rateType
-){
+) {
 }

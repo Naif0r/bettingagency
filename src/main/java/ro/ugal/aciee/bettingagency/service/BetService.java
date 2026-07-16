@@ -72,9 +72,9 @@ public class BetService {
     }
 
     public Bet importer(Bet bet) {
-        try{
+        try {
             return betDAO.importer(bet);
-        } catch (SQLException e){
+        } catch (SQLException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
     }

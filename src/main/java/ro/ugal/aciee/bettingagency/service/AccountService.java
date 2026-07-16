@@ -76,7 +76,7 @@ public class AccountService {
     public Account importer(Account account) {
         try {
             return accountDAO.importer(account);
-        } catch (SQLException e){
+        } catch (SQLException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
     }

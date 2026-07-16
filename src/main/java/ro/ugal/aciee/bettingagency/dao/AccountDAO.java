@@ -114,8 +114,8 @@ public class AccountDAO {
                 INSERT INTO ACCOUNT (user_id, username, password, role, account_status, balance)
                 VALUES (?, ?, ?, ?, ?, ?);
                 """;
-        try(Connection con = ConnectionManager.open();
-            PreparedStatement stmt = con.prepareStatement(sql)){
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, account.getUserId());
             stmt.setString(2, account.getUsername());
             stmt.setString(3, account.getPassword());

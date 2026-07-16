@@ -13,7 +13,7 @@ public class ImportAndExportManager {
     private static final ReadExcelFormula readExcelFormula = new ReadExcelFormula();
     private static final WriteExcelFormula writeExcelFormula = new WriteExcelFormula();
 
-    public static boolean importExcelFile(File file)  {
+    public static boolean importExcelFile(File file) {
         try {
             Workbook workbook = WorkbookFactory.create(file);
 
@@ -28,12 +28,12 @@ public class ImportAndExportManager {
             workbook.close();
 
             return true;
-        } catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
 
-    public static boolean exportExcelFile(String file)  {
+    public static boolean exportExcelFile(String file) {
         try {
             Workbook workbook = new XSSFWorkbook();
 
@@ -52,7 +52,7 @@ public class ImportAndExportManager {
             workbook.close();
 
             return true;
-        } catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }

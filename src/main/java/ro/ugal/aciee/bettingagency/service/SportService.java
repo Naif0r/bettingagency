@@ -29,7 +29,7 @@ public class SportService {
     public Sport importer(Sport sport) {
         try {
             return sportDAO.importer(sport);
-        } catch (SQLException e){
+        } catch (SQLException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
     }

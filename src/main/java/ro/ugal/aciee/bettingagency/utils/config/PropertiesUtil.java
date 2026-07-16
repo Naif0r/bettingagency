@@ -11,21 +11,21 @@ public class PropertiesUtil {
         loadProperties();
     }
 
-    private static void loadProperties(){
-        try(InputStream input = PropertiesUtil.class.getClassLoader()
-                .getResourceAsStream("application.properties")){
+    private static void loadProperties() {
+        try (InputStream input = PropertiesUtil.class.getClassLoader()
+                .getResourceAsStream("application.properties")) {
 
             if (input == null) {
                 throw new RuntimeException("application.properties not found in classpath");
             }
 
             PROPERTIES.load(input);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static String get(String key){
+    public static String get(String key) {
         return PROPERTIES.getProperty(key);
     }
 }

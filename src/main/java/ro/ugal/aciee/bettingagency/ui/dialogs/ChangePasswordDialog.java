@@ -6,7 +6,7 @@ import ro.ugal.aciee.bettingagency.ui.Session;
 import javax.swing.*;
 import java.awt.*;
 
-public class ChangePasswordDialog extends  JDialog{
+public class ChangePasswordDialog extends JDialog {
     private final AccountService accountService = new AccountService();
     private final JPasswordField newPasswordField;
 

@@ -190,7 +190,6 @@ public class TopPanel extends JPanel {
                 );
             }
         }
-
     }
 
     private void loadData() {

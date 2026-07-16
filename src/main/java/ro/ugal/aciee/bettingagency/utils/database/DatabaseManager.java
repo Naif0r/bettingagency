@@ -94,22 +94,22 @@ public class DatabaseManager {
     private static final String SQL_SEQUENCE = """
             SELECT setval(pg_get_serial_sequence('account', 'user_id'),
                                 COALESCE((SELECT MAX(user_id) FROM account), 1), true);
-                    
+            
             SELECT setval(pg_get_serial_sequence('sport', 'sport_id'),
                                 COALESCE((SELECT MAX(sport_id) FROM sport), 1), true);
-                    
+            
             SELECT setval(pg_get_serial_sequence('team', 'team_id'),
                                 COALESCE((SELECT MAX(team_id) FROM team), 1), true);
-                    
+            
             SELECT setval(pg_get_serial_sequence('match', 'match_id'),
                                 COALESCE((SELECT MAX(match_id) FROM match), 1), true);
-                    
+            
             SELECT setval(pg_get_serial_sequence('rate', 'rate_id'),
                                 COALESCE((SELECT MAX(rate_id) FROM rate), 1), true);
-                    
+            
             SELECT setval(pg_get_serial_sequence('bet', 'bet_id'),
                                 COALESCE((SELECT MAX(bet_id) FROM bet), 1), true);
-             """;
+            """;
 
     public static boolean initialize() {
         try (Connection con = ConnectionManager.open();
@@ -150,7 +150,7 @@ public class DatabaseManager {
         }
     }
 
-    public static boolean resetSequences(){
+    public static boolean resetSequences() {
         try (Connection con = ConnectionManager.open();
              Statement stmt = con.createStatement()) {
             stmt.execute(SQL_SEQUENCE);

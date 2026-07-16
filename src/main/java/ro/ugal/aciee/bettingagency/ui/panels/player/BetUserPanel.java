@@ -117,11 +117,9 @@ public class BetUserPanel extends JPanel {
             matchesInfo.setLayout(new BoxLayout(matchesInfo, BoxLayout.Y_AXIS));
 
             List<BetLegDTO> betLegDTOList = matchService.getMatchInfoByBet(bet.getBetId());
-            List<Match> matchList = new ArrayList<>();
 
             for (BetLegDTO betLegDTO : betLegDTOList) {
                 Match match = betLegDTO.match();
-                matchList.add(match);
                 String team1 = betLegDTO.team1Name();
                 String team2 = betLegDTO.team2Name();
 
@@ -152,7 +150,6 @@ public class BetUserPanel extends JPanel {
                 southPanel.add(cashOutButton, BorderLayout.EAST);
             }
 
-
             southPanel.add(betInfo, BorderLayout.WEST);
 
             betPanel.add(matchesInfo, BorderLayout.CENTER);
@@ -166,6 +163,7 @@ public class BetUserPanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE
             );
         }
+
         return betPanel;
     }
 

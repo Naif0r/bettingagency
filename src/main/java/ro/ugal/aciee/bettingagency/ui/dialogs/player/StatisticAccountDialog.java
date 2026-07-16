@@ -16,9 +16,9 @@ public class StatisticAccountDialog extends JDialog {
     private final JLabel winBetLabel;
     private final JLabel loseBetLabel;
     private final JLabel status;
-    private Account account;
     private final BetService betService = new BetService();
     private final AccountService accountService = new AccountService();
+    private Account account;
 
     public StatisticAccountDialog(JFrame parent) {
         super(parent, "Account statistic", true);
@@ -89,7 +89,7 @@ public class StatisticAccountDialog extends JDialog {
 
             status.setText(account.getAccountStatus().toString());
 
-            if (account.getAccountStatus() == AccountStatus.ACTIVE){
+            if (account.getAccountStatus() == AccountStatus.ACTIVE) {
                 status.setForeground(Color.GREEN);
             } else {
                 status.setForeground(Color.RED);

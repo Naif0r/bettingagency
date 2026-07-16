@@ -1,6 +1,5 @@
 package ro.ugal.aciee.bettingagency.dao;
 
-import ro.ugal.aciee.bettingagency.model.Sport;
 import ro.ugal.aciee.bettingagency.model.Team;
 import ro.ugal.aciee.bettingagency.utils.database.ConnectionManager;
 
@@ -10,8 +9,10 @@ import java.util.List;
 
 public class TeamDAO {
     public Team save(Team team) throws SQLException {
-        String sql = "INSERT INTO TEAM (sport_id, team_name)" +
-                "VALUES (?, ?)";
+        String sql = """
+                INSERT INTO TEAM (sport_id, team_name)
+                VALUES (?, ?);
+                """;
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, team.getSportId());
@@ -30,8 +31,8 @@ public class TeamDAO {
                 INSERT INTO TEAM (team_id, sport_id, team_name)
                 VALUES (?, ?, ?);
                 """;
-        try(Connection con = ConnectionManager.open();
-            PreparedStatement stmt = con.prepareStatement(sql)){
+        try (Connection con = ConnectionManager.open();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, team.getTeamId());
             stmt.setInt(2, team.getSportId());
             stmt.setString(3, team.getTeamName());

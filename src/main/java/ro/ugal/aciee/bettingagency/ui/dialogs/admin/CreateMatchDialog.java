@@ -11,7 +11,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 
 public class CreateMatchDialog extends JDialog {
     private final SportService sportService = new SportService();

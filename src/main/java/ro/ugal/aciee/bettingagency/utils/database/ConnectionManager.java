@@ -11,12 +11,12 @@ public class ConnectionManager {
     private static final String USERNAME_KEY = "db.username";
     private static final String PASSWORD_KEY = "db.password";
 
-    public static Connection open(){
-        try{
+    public static Connection open() {
+        try {
             return DriverManager.getConnection(PropertiesUtil.get(URL_KEY),
                     PropertiesUtil.get(USERNAME_KEY),
                     PropertiesUtil.get(PASSWORD_KEY));
-        } catch (SQLException e){
+        } catch (SQLException e) {
             throw new RuntimeException("Cannot connect to database", e);
         }
     }

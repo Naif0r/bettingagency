@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Session {
-    private static Account currentAccount;
     private static final List<Runnable> accountChangeListeners = new ArrayList<>();
     private static final List<Runnable> authChangeListeners = new ArrayList<>();
+    private static Account currentAccount;
 
     public static void login(Account account) {
         currentAccount = account;

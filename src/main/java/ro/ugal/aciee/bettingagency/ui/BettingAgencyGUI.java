@@ -1,7 +1,8 @@
 package ro.ugal.aciee.bettingagency.ui;
 
 import ro.ugal.aciee.bettingagency.model.enums.Role;
-import ro.ugal.aciee.bettingagency.ui.panels.*;
+import ro.ugal.aciee.bettingagency.ui.panels.NavPanel;
+import ro.ugal.aciee.bettingagency.ui.panels.TopPanel;
 import ro.ugal.aciee.bettingagency.ui.panels.admin.HomeAdminPanel;
 import ro.ugal.aciee.bettingagency.ui.panels.player.BetUserPanel;
 import ro.ugal.aciee.bettingagency.ui.panels.player.HomePanel;
@@ -60,7 +61,7 @@ public class BettingAgencyGUI extends JFrame {
     }
 
     public void showBetsPanel() {
-        if (Session.isLoggedIn()){
+        if (Session.isLoggedIn()) {
             betUserPanel.loadUserBets();
             cardLayout.show(centerContainer, "BETS");
         } else {

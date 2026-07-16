@@ -18,8 +18,10 @@ import java.util.List;
 public class BetRateDAO {
     public BetRate save(BetRate betRate) {
         try {
-            String sql = "INSERT INTO BET_RATE (bet_id, rate_id)" +
-                    "VALUES (?, ?)";
+            String sql = """
+                    INSERT INTO BET_RATE (bet_id, rate_id)
+                    VALUES (?, ?);
+                    """;
             try (Connection con = ConnectionManager.open();
                  PreparedStatement stmt = con.prepareStatement(sql)) {
                 stmt.setInt(1, betRate.getBetId());

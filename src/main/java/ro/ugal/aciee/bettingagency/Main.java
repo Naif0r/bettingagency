@@ -5,7 +5,6 @@ import ro.ugal.aciee.bettingagency.utils.database.DatabaseManager;
 
 import javax.swing.*;
 
-
 public class Main {
     public static void main(String[] args) {
         try {

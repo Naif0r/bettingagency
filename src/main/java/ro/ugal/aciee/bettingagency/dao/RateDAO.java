@@ -12,8 +12,10 @@ import java.util.List;
 
 public class RateDAO {
     public Rate save(Rate rate) throws SQLException {
-        String sql = "INSERT INTO RATE (match_id, type, value)" +
-                "VALUES (?, ?, ?)";
+        String sql = """
+                INSERT INTO RATE (match_id, type, value)
+                VALUES (?, ?, ?);
+                """;
         try (Connection con = ConnectionManager.open();
              PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, rate.getMatchId());

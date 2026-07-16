@@ -3,10 +3,7 @@ package ro.ugal.aciee.bettingagency.service;
 import ro.ugal.aciee.bettingagency.dao.TeamDAO;
 import ro.ugal.aciee.bettingagency.model.Sport;
 import ro.ugal.aciee.bettingagency.model.Team;
-import ro.ugal.aciee.bettingagency.utils.database.ConnectionManager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -41,7 +38,7 @@ public class TeamService {
     public Team importer(Team team) {
         try {
             return teamDAO.importer(team);
-        } catch (SQLException e){
+        } catch (SQLException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
     }
@@ -74,17 +71,17 @@ public class TeamService {
         return team;
     }
 
-    public Team getByTeamAndSport(String teamName, String sportName) throws  SQLException{
+    public Team getByTeamAndSport(String teamName, String sportName) throws SQLException {
         teamName = teamName.trim();
         sportName = sportName.trim();
 
-        if(teamName.isBlank() || sportName.isBlank()){
+        if (teamName.isBlank() || sportName.isBlank()) {
             throw new IllegalArgumentException("Name(team/sport) is blank");
         }
 
         Team team = teamDAO.getByTeamNameAndSport(teamName, sportName);
 
-        if(team == null){
+        if (team == null) {
             throw new IllegalArgumentException("Team not found");
         }
 

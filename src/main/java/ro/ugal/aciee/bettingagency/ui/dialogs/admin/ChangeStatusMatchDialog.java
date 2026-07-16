@@ -71,7 +71,7 @@ public class ChangeStatusMatchDialog extends JDialog {
                 List<Bet> betMatchList = betService.getAllBetByMatchId(matchId);
                 List<Rate> rateList = rateService.getByMatchId(matchId);
 
-                for(Rate rate : rateList){
+                for (Rate rate : rateList) {
                     rateService.updateStatus(rate.getRateId(), RateStatus.CLOSED);
                 }
 
